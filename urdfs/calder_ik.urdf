@@ -1,0 +1,890 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="stretch">
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0.00514433050871097 0.00440682514417822 0.0955736588570845" rpy="0.0 -0.0 0.0" />
+      <mass value="13.5562359307973" />
+      <inertia ixx="0.107686531825198" ixy="0.0118929785059585" ixz="9.59722078401422e-05" iyy="0.100795455733648" iyz="0.000112624358311468" izz="0.196591432959814" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/base_link.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="base_link_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/base_link_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_wheel_0">
+    <inertial>
+      <origin xyz="-1.23869269856441e-05 5.05444508105968e-06 -0.000272307437541336" rpy="0.0 -0.0 0.0" />
+      <mass value="5.91083725603039" />
+      <inertia ixx="0.0152909785789222" ixy="2.17024734681016e-06" ixz="-4.38920076498771e-11" iyy="0.0152954273367906" iyz="2.37149703513913e-11" izz="0.0295034258665265" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_wheel_0.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_wheel_0_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_wheel_0_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_wheel_1">
+    <inertial>
+      <origin xyz="-1.23869269857274e-05 5.05444508082376e-06 -0.000272307437540781" rpy="0.0 -0.0 0.0" />
+      <mass value="5.91083725603038" />
+      <inertia ixx="0.0152909785789221" ixy="2.17024734682579e-06" ixz="-4.38920141550999e-11" iyy="0.0152954273367906" iyz="2.37149692452202e-11" izz="0.0295034258665265" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_wheel_1.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_wheel_1_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_wheel_1_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_wheel_2">
+    <inertial>
+      <origin xyz="-1.23869269858329e-05 5.05444508108743e-06 -0.000272307437540947" rpy="0.0 -0.0 0.0" />
+      <mass value="5.91083725603039" />
+      <inertia ixx="0.0152909785789221" ixy="2.17024734682085e-06" ixz="-4.38920100573603e-11" iyy="0.0152954273367906" iyz="2.37149697365226e-11" izz="0.0295034258665265" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_wheel_2.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_wheel_2_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_wheel_2_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_mast">
+    <inertial>
+      <origin xyz="-0.000300093584880007 -0.00264667071603227 0.760048216627824" rpy="0.0 -0.0 0.0" />
+      <mass value="2.75640275898747" />
+      <inertia ixx="0.45650789366954" ixy="-7.56940928263702e-08" ixz="-1.33902589456662e-05" iyy="0.457601762746667" iyz="5.99502801613857e-05" izz="0.00221354588130509" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_mast.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_mast_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_mast_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_lift">
+    <inertial>
+      <origin xyz="-0.010177 0.073811 0.011138" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0288" />
+      <inertia ixx="0.0010359" ixy="1.0741e-06" ixz="1.4714e-06" iyy="0.0016224" iyz="7.6565e-06" izz="0.0014304" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_lift.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1.0" />
+      </material>
+    </visual>
+    <collision name="link_lift_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_lift_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_arm_l4">
+    <inertial>
+      <origin xyz="-0.0239972123037574 -0.0255887742453367 0.0193230093422857" rpy="0.0 -0.0 0.0" />
+      <mass value="1.02881647942949" />
+      <inertia ixx="0.00143035235982624" ixy="-7.6564794633502e-06" ixz="-1.47136459522242e-06" iyy="0.00162235086887283" iyz="1.07412364584802e-06" izz="0.00103586999252795" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_arm_l4.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_arm_l4_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_arm_l4_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_arm_l3">
+    <inertial>
+      <origin xyz="-0.00169665741446959 1.23403252570972e-09 0.113070073025036" rpy="0.0 -0.0 0.0" />
+      <mass value="0.253486099124945" />
+      <inertia ixx="0.000737536729507803" ixy="-9.08021621616576e-12" ixz="3.82918469411758e-07" iyy="0.000702211587154542" iyz="8.68479548302753e-13" izz="0.000254621456596521" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_arm_l3.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_arm_l3_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_arm_l3_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_arm_l2">
+    <inertial>
+      <origin xyz="-0.00200862767560275 -2.37708643237041e-07 0.11575295983075" rpy="0.0 -0.0 0.0" />
+      <mass value="0.230201100449269" />
+      <inertia ixx="0.00067693174796559" ixy="7.06775027324587e-11" ixz="3.69132685571246e-07" iyy="0.000645972130726903" iyz="1.33356172877691e-10" izz="0.000198378308146697" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_arm_l2.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_arm_l2_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_arm_l2_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_arm_l1">
+    <inertial>
+      <origin xyz="-0.00206877773678352 4.64135829870316e-08 0.117804074365061" rpy="0.0 -0.0 0.0" />
+      <mass value="0.209448188270983" />
+      <inertia ixx="0.00061875328670928" ixy="6.90064246707914e-13" ixz="3.97498796914924e-07" iyy="0.000592846918859573" iyz="-2.23040547916895e-11" izz="0.000152502662187207" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_arm_l1.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_arm_l1_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_arm_l1_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_arm_l0">
+    <inertial>
+      <origin xyz="0.000157238310870889 5.01583000786141e-05 0.143401998179257" rpy="0.0 -0.0 0.0" />
+      <mass value="0.223863586205856" />
+      <inertia ixx="0.000562605943974274" ixy="-3.0621845744341e-08" ixz="-4.42295658647927e-06" iyy="0.000533741593573117" iyz="3.00978974443158e-07" izz="0.00010979815336459" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_arm_l0.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_arm_l0_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_arm_l0_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_wrist">
+    <inertial>
+      <origin xyz="-5.01583000787247e-05 0.107748001820743 -0.0365627616891291" rpy="0.0 -0.0 0.0" />
+      <mass value="0.223863586205856" />
+      <inertia ixx="0.000533741593573117" ixy="3.00978974443158e-07" ixz="3.06218457443427e-08" iyy="0.00010979815336459" iyz="4.42295658647907e-06" izz="0.000562605943974274" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_wrist.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_wrist_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_wrist_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_wrist_yaw">
+    <inertial>
+      <origin xyz="2.74719532805667e-06 -0.0110701765374636 -0.0376074272052764" rpy="0.0 -0.0 0.0" />
+      <mass value="0.0650887840859013" />
+      <inertia ixx="4.11768410522444e-05" ixy="-2.7058934246207e-09" ixz="4.39672768559084e-10" iyy="4.58699643262951e-05" iyz="-1.02061178287982e-05" izz="3.30808107327574e-05" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_wrist_yaw.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_wrist_yaw_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_wrist_yaw_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_wrist_pitch">
+    <inertial>
+      <origin xyz="-0.0110706850212995 -2.66291010447839e-06 -0.0376071378186492" rpy="0.0 -0.0 0.0" />
+      <mass value="0.0650867154718394" />
+      <inertia ixx="4.58691837843858e-05" ixy="2.51845931283525e-09" ixz="-1.02065284617009e-05" iyy="4.1176014545814e-05" iyz="-4.70592436022059e-10" izz="3.30798811861284e-05" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_wrist_pitch.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_wrist_pitch_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_wrist_pitch_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_wrist_roll">
+    <inertial>
+      <origin xyz="-0.000296390965980678 0.0226302480199338 -0.0109292428654148" rpy="0.0 -0.0 0.0" />
+      <mass value="0.0753095617019353" />
+      <inertia ixx="2.37018193157892e-05" ixy="-3.75855542286948e-07" ixz="-5.48573573618569e-08" iyy="1.97416202279188e-05" iyz="-3.96827582495582e-07" izz="4.14882016029158e-05" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_wrist_roll.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_wrist_roll_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_wrist_roll_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="gripper_camera_link">
+    <inertial>
+      <origin xyz="-0.0223446470830515 1.66533453693773e-16 -0.00195490331025469" rpy="0.0 -0.0 0.0" />
+      <mass value="0.00129300056740974" />
+      <inertia ixx="2.74544694611597e-07" ixy="4.3965898460581e-17" ixz="1.20174222803583e-08" iyy="1.38626653185758e-07" iyz="-5.0253523920199e-16" izz="1.38236317617069e-07" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/gripper_camera_link.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+    <collision name="gripper_camera_link_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/gripper_camera_link_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="gripper_camera_color_optical_frame">
+    <visual>
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="link_tool_attachment_site">
+    <inertial>
+      <origin xyz="0.0226302480199337 -0.000296390965980678 -0.00767075713458523" rpy="0.0 -0.0 0.0" />
+      <mass value="0.0753095617019353" />
+      <inertia ixx="1.97416202279188e-05" ixy="-3.75855542286946e-07" ixz="3.96827582495584e-07" iyy="2.37018193157892e-05" iyz="5.48573573618872e-08" izz="4.14882016029158e-05" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_tool_attachment_site.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_tool_attachment_site_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_tool_attachment_site_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_head">
+    <inertial>
+      <origin xyz="0.0819038922516343 0.0589512717682973 -0.0272706012081338" rpy="0.0 -0.0 0.0" />
+      <mass value="0.756708037003781" />
+      <inertia ixx="0.00395166436739571" ixy="-0.00155079731955219" ixz="-0.000259117236423362" iyy="0.00286937921131711" iyz="-0.000180183129653162" izz="0.00617211649463633" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_head.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_head_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_head_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_lidar_right">
+    <inertial>
+      <origin xyz="-3.41165516504205e-07 9.3353681169972e-05 -0.0149855278333961" rpy="0.0 -0.0 0.0" />
+      <mass value="0.240129984576517" />
+      <inertia ixx="0.000146166186518683" ixy="4.49512156455646e-09" ixz="-2.40940580835519e-09" iyy="0.000145410874821053" iyz="5.51572267905211e-07" izz="0.000105068916952094" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_lidar_right.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.298039215686275 0.298039215686275 0.298039215686275 1.0" />
+      </material>
+    </visual>
+    <collision name="link_lidar_right_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_lidar_right_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_lidar_left">
+    <inertial>
+      <origin xyz="-3.64570412969556e-07 9.33562504382701e-05 -0.0149855279355643" rpy="0.0 -0.0 0.0" />
+      <mass value="0.240130005023899" />
+      <inertia ixx="0.000146166184261564" ixy="4.48854842975454e-09" ixz="-2.40685181068564e-09" iyy="0.000145410877646749" iyz="5.51572327681655e-07" izz="0.000105068917357411" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_lidar_left.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.298039215686275 0.298039215686275 0.298039215686275 1.0" />
+      </material>
+    </visual>
+    <collision name="link_lidar_left_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_lidar_left_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_camera_right">
+    <inertial>
+      <origin xyz="1.00524908397404e-07 -0.00193564743441606 0.00754509647795354" rpy="0.0 -0.0 0.0" />
+      <mass value="0.00642886997947339" />
+      <inertia ixx="6.06307360003226e-07" ixy="-2.1842777945984e-12" ixz="-4.26656864224491e-12" iyy="5.59121406652911e-07" iyz="-9.40924476057544e-08" izz="4.10490472564357e-07" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_camera_right.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+    <collision name="link_camera_right_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_camera_right_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_camera_right_optical">
+    <visual>
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="link_camera_left">
+    <inertial>
+      <origin xyz="1.00624301557772e-07 -0.00193564737479919 0.00754509569296213" rpy="0.0 -0.0 0.0" />
+      <mass value="0.00642886892007917" />
+      <inertia ixx="6.06307342762743e-07" ixy="-2.21160963515807e-12" ixz="-4.27150581858374e-12" iyy="5.59121336730754e-07" iyz="-9.40924471807776e-08" izz="4.10490440478144e-07" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_camera_left.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+    <collision name="link_camera_left_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_camera_left_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_camera_left_optical">
+    <visual>
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="link_camera_center">
+    <inertial>
+      <origin xyz="0.000269762788811967 -0.00250168278710533 0.000932547860629795" rpy="0.0 -0.0 0.0" />
+      <mass value="0.00266363902430246" />
+      <inertia ixx="1.23503897332185e-07" ixy="-1.41426856930227e-22" ixz="-5.29395592033938e-23" iyy="1.05396694902143e-07" iyz="-6.23002529451332e-09" izz="2.021440741744e-07" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_camera_center.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+    <collision name="link_camera_center_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_camera_center_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_camera_center_optical">
+    <visual>
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="link_gripper_s4_body">
+    <inertial>
+      <origin xyz="0.000254680411669757 -0.0022071243345444 0.0412212077277816" rpy="0.0 -0.0 0.0" />
+      <mass value="0.161899905634651" />
+      <inertia ixx="0.000140924380883794" ixy="5.43499131089203e-07" ixz="4.48324508738616e-07" iyy="0.000161419526106189" iyz="-5.51743125876182e-06" izz="5.9463817175733e-05" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_gripper_s4_body.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_gripper_s4_body_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_gripper_s4_body_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_gripper_finger_right">
+    <inertial>
+      <origin xyz="-0.0197363517714474 -3.172086394291e-06 -0.102874799750029" rpy="0.0 -0.0 0.0" />
+      <mass value="0.0196451967584484" />
+      <inertia ixx="5.78135538944561e-05" ixy="-4.00009790917169e-09" ixz="-6.95117285144868e-06" iyy="6.49200844454336e-05" iyz="-7.11107056414431e-10" izz="7.66306923997872e-06" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_gripper_finger_right.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_gripper_finger_right_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_gripper_finger_right_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_gripper_fingertip_right">
+    <inertial>
+      <origin xyz="0.00993872170652124 -0.000285818765201663 0.00123489273883474" rpy="0.0 -0.0 0.0" />
+      <mass value="0.0135718311124709" />
+      <inertia ixx="8.68899478458786e-07" ixy="6.62027192054713e-08" ixz="1.81438310337096e-08" iyy="2.05061368512857e-06" iyz="2.09472921753242e-09" izz="2.55635443493753e-06" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_gripper_fingertip_right.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1.0" />
+      </material>
+    </visual>
+    <collision name="link_gripper_fingertip_right_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_gripper_fingertip_right_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_gripper_finger_left">
+    <inertial>
+      <origin xyz="0.0197238425895227 3.17145204552964e-06 -0.102896385741803" rpy="0.0 -0.0 0.0" />
+      <mass value="0.0196491261592472" />
+      <inertia ixx="5.78135538944637e-05" ixy="-4.00009790983065e-09" ixz="6.951172851427e-06" iyy="6.49200844454592e-05" iyz="7.11107056532095e-10" izz="7.66306923999676e-06" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_gripper_finger_left.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1.0" />
+      </material>
+    </visual>
+    <collision name="link_gripper_finger_left_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_gripper_finger_left_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_gripper_fingertip_left">
+    <inertial>
+      <origin xyz="-0.00993872027414147 -0.000285961709470721 0.00123489750323307" rpy="0.0 -0.0 0.0" />
+      <mass value="0.013571818497411" />
+      <inertia ixx="8.68899001201249e-07" ixy="-6.62024210802674e-08" ixz="-1.81433432481193e-08" iyy="2.05061418474457e-06" iyz="2.07717297674451e-09" izz="2.55635428943701e-06" />
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="./SE4_calder/./meshes/link_gripper_fingertip_left.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1.0" />
+      </material>
+    </visual>
+    <collision name="link_gripper_fingertip_left_collision">
+      <geometry>
+        <mesh filename="./SE4_calder/meshes/link_gripper_fingertip_left_collision.STL" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    </collision>
+  </link>
+  <link name="link_grasp_center">
+    <visual>
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="laser" />
+  <link name="virtual_base" />
+  <joint name="joint_wheel_0" type="fixed">
+    <parent link="base_link" />
+    <child link="link_wheel_0" />
+    <origin xyz="0.150688420258492 0.0869999999999999 0.0742" rpy="-1.5707963267949 -0.0 -1.0471975511966" />
+    <axis xyz="0.0 0.0 1.0" />
+  </joint>
+  <joint name="joint_wheel_1" type="fixed">
+    <parent link="base_link" />
+    <child link="link_wheel_1" />
+    <origin xyz="-0.150688420258493 0.0870000000000007 0.0741999999999998" rpy="-1.5707963267949 -0.0 1.04719755119659" />
+    <axis xyz="0.0 0.0 1.0" />
+  </joint>
+  <joint name="joint_wheel_2" type="fixed">
+    <parent link="base_link" />
+    <child link="link_wheel_2" />
+    <origin xyz="0.0 -0.174 0.0742" rpy="-1.5707963267949 -0.0 -3.14159265358979" />
+    <axis xyz="0.0 0.0 1.0" />
+  </joint>
+  <joint name="joint_mast" type="fixed">
+    <parent link="base_link" />
+    <child link="link_mast" />
+    <origin xyz="-0.093 -0.098 0.0062" rpy="0.0 -0.0 0.0" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_lift" type="prismatic">
+    <parent link="link_mast" />
+    <child link="link_lift" />
+    <origin xyz="0.0 -0.00140000000000023 0.218" rpy="0.0 -0.0 0.0" />
+    <axis xyz="0.0 0.0 1.0" />
+    <limit effort="0.0" velocity="0.0" lower="0.0" upper="1.21" />
+  </joint>
+  <joint name="joint_arm_l4" type="fixed">
+    <parent link="link_lift" />
+    <child link="link_arm_l4" />
+    <origin xyz="-0.0295000000000002 0.0993999999999996 -0.0128595489452179" rpy="3.141592653589793 1.5707963267948932 3.141592653589793" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_arm_l3" type="fixed">
+    <parent link="link_arm_l4" />
+    <child link="link_arm_l3" />
+    <origin xyz="0.0 0.0 0.00150000000000011" rpy="0.0 -0.0 0.0" />
+    <axis xyz="0.0 0.0 1.0" />
+    <limit effort="0.0" velocity="0.0" lower="0.0" upper="0.13" />
+  </joint>
+  <joint name="joint_arm_l2" type="fixed">
+    <parent link="link_arm_l3" />
+    <child link="link_arm_l2" />
+    <origin xyz="0.0 0.0 0.0135" rpy="0.0 -0.0 0.0" />
+    <axis xyz="0.0 0.0 1.0" />
+    <limit effort="0.0" velocity="0.0" lower="0.0" upper="0.13" />
+  </joint>
+  <joint name="joint_arm_l1" type="fixed">
+    <parent link="link_arm_l2" />
+    <child link="link_arm_l1" />
+    <origin xyz="0.0 0.0 0.0135000000000001" rpy="0.0 -0.0 0.0" />
+    <axis xyz="0.0 0.0 1.0" />
+    <limit effort="0.0" velocity="0.0" lower="0.0" upper="0.13" />
+  </joint>
+  <joint name="joint_arm_l0" type="prismatic">
+    <parent link="link_arm_l4" />
+    <child link="link_arm_l0" />
+    <origin xyz="0.0 0.0 0.0137499999999999" rpy="0.0 -0.0 0.0" />
+    <axis xyz="0.0 0.0 1.0" />
+    <limit effort="0.0" velocity="0.0" lower="0.0" upper="0.52" />
+  </joint>
+  <joint name="joint_wrist" type="fixed">
+    <parent link="link_arm_l0" />
+    <child link="link_wrist" />
+    <origin xyz="0.03672 0.0 0.25115" rpy="-1.5707963267949 -0.0 -1.5707963267949" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_wrist_yaw" type="revolute">
+    <parent link="link_wrist" />
+    <child link="link_wrist_yaw" />
+    <origin xyz="0.0 0.0 0.0" rpy="-3.14159265358979 -0.0 -1.5707963267949" />
+    <axis xyz="0.0 0.0 1.0" />
+    <limit effort="0.0" velocity="0.0" lower="-1.135" upper="4.276" />
+  </joint>
+  <joint name="joint_wrist_pitch" type="revolute">
+    <parent link="link_wrist_yaw" />
+    <child link="link_wrist_pitch" />
+    <origin xyz="0.0 -0.0422199999999991 -0.0452" rpy="1.5707963267949 -0.0 3.14159265358979" />
+    <axis xyz="0.0 0.0 -1.0" />
+    <limit effort="0.0" velocity="0.0" lower="-1.2566370614359172" upper="1.135" />
+  </joint>
+  <joint name="joint_wrist_roll" type="revolute">
+    <parent link="link_wrist_pitch" />
+    <child link="link_wrist_roll" />
+    <origin xyz="-0.0422200000000001 0.0 -0.0451999999999999" rpy="3.141592653589793 1.5707963267948932 3.141592653589793" />
+    <axis xyz="0.0 0.0 -1.0" />
+    <limit effort="0.0" velocity="0.0" lower="-1.135" upper="4.276" />
+  </joint>
+  <joint name="gripper_camera_joint" type="fixed">
+    <parent link="link_wrist_roll" />
+    <child link="gripper_camera_link" />
+    <origin xyz="0.0 0.0660508839816557 -0.0253083308175168" rpy="-1.5707963267948932 1.5707963267948932 3.141592653589793" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="gripper_camera_color_optical_joint" type="fixed">
+    <parent link="gripper_camera_link" />
+    <child link="gripper_camera_color_optical_frame" />
+    <origin xyz="0.0 0.0 0.0" rpy="1.48352986419518 -0.0 1.5707963267949" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_tool_attachment_site" type="fixed">
+    <parent link="link_wrist_roll" />
+    <child link="link_tool_attachment_site" />
+    <origin xyz="0.0 0.0 -0.0186" rpy="-3.14159265358979 -0.0 1.5707963267949" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_head" type="fixed">
+    <parent link="base_link" />
+    <child link="link_head" />
+    <origin xyz="-0.0929999999999916 -0.0979712843578371 1.56459738" rpy="0.0 -0.0 0.0" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_lidar_right" type="fixed">
+    <parent link="link_head" />
+    <child link="link_lidar_right" />
+    <origin xyz="0.131744211811823 -0.026442458187041 -0.0608470180234015" rpy="-3.05465659239941 0.781600065124168 2.39203005564319" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_lidar_left" type="fixed">
+    <parent link="link_head" />
+    <child link="link_lidar_left" />
+    <origin xyz="0.131744211811828 0.222385026902713 -0.0608470180234018" rpy="-3.05465659239939 -0.781600065124167 0.7495625979465731" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_camera_right" type="fixed">
+    <parent link="link_head" />
+    <child link="link_camera_right" />
+    <origin xyz="0.166840602787886 0.0229712843578372 -0.0172566987072469" rpy="3.14159265358979 0.75049157835756 3.14159265358979" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_camera_right_optical" type="fixed">
+    <parent link="link_camera_right" />
+    <child link="link_camera_right_optical" />
+    <origin xyz="0.0 0.0 0.0212000000000001" rpy="0.0 -0.0 -1.5707963267949" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_camera_left" type="fixed">
+    <parent link="link_head" />
+    <child link="link_camera_left" />
+    <origin xyz="0.166840602787886 0.172971284357837 -0.0172566987072471" rpy="-3.14159265358979 -0.75049157835756 0.0" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_camera_left_optical" type="fixed">
+    <parent link="link_camera_left" />
+    <child link="link_camera_left_optical" />
+    <origin xyz="0.0 0.0 0.0212000000000001" rpy="0.0 -0.0 1.5707963267949" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_camera_center" type="fixed">
+    <parent link="link_head" />
+    <child link="link_camera_center" />
+    <origin xyz="0.172088299107666 0.0979712843578372 -0.0256260836985045" rpy="-3.14159265358979 -0.95993108859688 0.0" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_camera_center_optical" type="fixed">
+    <parent link="link_camera_center" />
+    <child link="link_camera_center_optical" />
+    <origin xyz="0.000303625621311365 0.0 0.00869470019506613" rpy="0.0 -0.0 1.5707963267949" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_gripper_finger_right" type="fixed">
+    <parent link="link_gripper_s4_body" />
+    <child link="link_gripper_finger_right" />
+    <origin xyz="-0.022261 0.0 0.037391" rpy="-3.1415853071795867 -0.0 -3.1415853071795867" />
+    <axis xyz="0.0 -1.0 0.0" />
+    <limit effort="0.0" velocity="0.0" lower="0.0" upper="0.5" />
+  </joint>
+  <joint name="joint_gripper_fingertip_right" type="fixed">
+    <parent link="link_gripper_finger_right" />
+    <child link="link_gripper_fingertip_right" />
+    <origin xyz="-0.0221679999883886 0.0 -0.191008332164326" rpy="-3.14159265358979 -1.29154364647579 3.14159265358979" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_gripper_finger_left" type="fixed">
+    <parent link="link_gripper_s4_body" />
+    <child link="link_gripper_finger_left" />
+    <origin xyz="0.022261 0.0 0.037391" rpy="-3.1415853071795867 -0.0 -3.1415853071795867" />
+    <axis xyz="0.0 1.0 0.0" />
+    <limit effort="0.0" velocity="0.0" lower="0.0" upper="0.5" />
+  </joint>
+  <joint name="joint_gripper_fingertip_left" type="fixed">
+    <parent link="link_gripper_finger_left" />
+    <child link="link_gripper_fingertip_left" />
+    <origin xyz="0.0221679999883923 0.0 -0.191008332164325" rpy="3.14159265358979 1.29154364647581 3.14159265358979" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_grasp_center" type="fixed">
+    <parent link="link_gripper_s4_body" />
+    <child link="link_grasp_center" />
+    <origin xyz="0.0 0.0 0.234538088082326" rpy="-1.5707963267948932 -1.5707963267948932 3.141592653589793" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_laser" type="fixed">
+    <parent link="base_link" />
+    <child link="laser" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_gripper_to_wrist" type="fixed">
+    <parent link="link_tool_attachment_site" />
+    <child link="link_gripper_s4_body" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 -1.57" />
+    <axis xyz="0.0 0.0 0.0" />
+  </joint>
+  <joint name="joint_mobile_base_planar" type="planar">
+    <parent link="virtual_base" />
+    <child link="base_link" />
+    <axis xyz="0 0 1" />
+    <limit effort="10" velocity="1" lower="-1.0" upper="1.0" />
+  </joint>
+<link name="base_footprint" /><joint name="base_link_to_base_footprint" type="fixed"><origin xyz="-0.000129 0.000248 -0.013263" rpy="0.018720 0.009756 0.000183" /><parent link="base_link" /><child link="base_footprint" /></joint></robot>
