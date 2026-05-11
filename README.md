@@ -1,4 +1,4 @@
-# Stretch 4 Human Pose Estimation
+# Stretch 4 Human Perception
 
 This repository provides tools and examples for performing real-time human pose estimation on the Stretch 4 mobile manipulator. It is standardized around the RTMO series of models via OpenVINO for fast, robust inference on edge devices (including CPU, GPU, and NPU), and now also supports SAM 3.1 for high-quality zero-shot segmentation.
 
