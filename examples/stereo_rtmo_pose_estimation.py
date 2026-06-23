@@ -3,7 +3,7 @@ import cv2
 import time
 import numpy as np
 from stretch4_human_pose_estimation import RTMOPipeline
-import stretch_body_ii.subsystem.cameras as cameras
+import stretch4_body.subsystem.cameras as cameras
 
 def process_and_display(pipeline: RTMOPipeline, image, window_name="Stereo RTMO Pose Estimation", display_text=None, style="cvpr"):
     start_time = time.time()

@@ -6,7 +6,7 @@ import numpy as np
 import rerun as rr
 import rerun.blueprint as rrb
 
-from stretch_body_ii.core.hello_utils import LoopTimer
+from stretch4_body.core.hello_utils import LoopTimer
 try:
     from stretch4_emulated_rgbd.api import get_emulated_rgbd_stream, DenseDepthImage, unproject_points
     from stretch4_emulated_rgbd.shared_utils import RGBDFrame
