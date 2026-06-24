@@ -1,11 +1,11 @@
 # Stretch 4 Human Perception
 
-This repository provides tools and examples for performing real-time human pose estimation on the Stretch 4 mobile manipulator. It is standardized around the RTMO series of models via OpenVINO for fast, robust inference on edge devices (including CPU, GPU, and NPU), and now also supports SAM 3.1 for high-quality zero-shot segmentation.
+This repository provides tools and examples for performing real-time human pose estimation on the Stretch 4 mobile manipulator. It primarily uses the RTMO series of models via OpenVINO for inference on edge devices (including CPU, GPU, and NPU), and SAM 3.1 for segmentation.
 
 > [!NOTE]
-> OpenVINO runs seamlessly on any x86_64 CPU (including AMD CPUs). Hardware-specific execution like `--device NPU` or `--device GPU` within standard OpenVINO builds requires compatible Intel hardware. On desktop setups with AMD CPUs or NVIDIA GPUs, use the default `--device AUTO` or `--device CPU`.
+> OpenVINO runs on any x86_64 compatible CPU. Hardware-specific execution like `--device NPU` or `--device GPU` within standard OpenVINO builds requires compatible Intel hardware. On desktop setups with AMD CPUs or NVIDIA GPUs, use the default `--device AUTO` or `--device CPU`.
 > 
-> **Important NPU Notice:** Due to a known OpenVINO compiler bug with the dynamic Non-Max Suppression (NMS) operators used in RTMO, running these models on the Intel NPU currently produces empty or garbage bounding boxes. If you specify `--device NPU`, the pipeline will automatically detect this limitation and safely fall back to the **GPU**, which executes the model flawlessly with full hardware acceleration.
+> **Important NPU Notice:** Due to a known OpenVINO compiler bug with the dynamic Non-Max Suppression (NMS) operators used in RTMO, running these models on the Intel NPU currently produces empty or garbage bounding boxes. If you specify `--device NPU`, the pipeline will automatically detect this limitation and safely fall back to the **GPU**, which executes the model with hardware acceleration.
 
 ## Installation
 
