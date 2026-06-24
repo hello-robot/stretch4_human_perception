@@ -70,7 +70,7 @@ def process_and_visualize(c_name: str, frame: RGBDFrame, pipeline: RTMOPipeline,
     rr.set_time("timestamp", timestamp=frame.timestamp)
     
     # 1. Receive an RGB-D image
-    image_bgr = frame.image_frame.image.copy()
+    image_bgr = frame.image.copy()
     orig_h, orig_w = image_bgr.shape[:2]
     
     # 2. Rotate the RGB image component of the RGB-D image to be upright
@@ -96,7 +96,7 @@ def process_and_visualize(c_name: str, frame: RGBDFrame, pipeline: RTMOPipeline,
     dense_depth = None
     if frame.depth_image is not None and frame.depth_image.shape[0] > 0:
         dense_processor = DenseDepthImage(
-            frame.image_frame.image, 
+            frame.image, 
             frame.depth_image, 
             apply_validity_mask=True, 
             camera_name=c_name, 
@@ -277,7 +277,14 @@ def main():
     loop_timer = LoopTimer()
     loop_timer.start_of_iteration()
     
-    use_both_lidars_default = not (args.lidar_left or args.lidar_right)
+    use_left = args.camera == "left"
+    use_right = args.camera == "right"
+    use_center = args.camera == "center"
+    use_left_right = args.camera == "left_right"
+    use_left_right_center = args.camera == "all"
+    use_both_lidars_default = args.lidar == "both"
+    use_left_lidar = args.lidar == "left" or use_both_lidars_default
+    use_right_lidar = args.lidar == "right" or use_both_lidars_default
     
     calibration = None
     if hasattr(args, 'opt_yaml') and args.opt_yaml:
@@ -289,13 +296,13 @@ def main():
     try:
         # Request stream from stretch4_emulated_rgbd
         streamer, generator = get_emulated_rgbd_stream(
-            use_left=args.left,
-            use_right=args.right,
-            use_center=args.center,
-            use_left_right=args.left_right,
-            use_left_right_center=args.left_right_center,
-            use_left_lidar=args.lidar_left or use_both_lidars_default,
-            use_right_lidar=args.lidar_right or use_both_lidars_default,
+            use_left=use_left,
+            use_right=use_right,
+            use_center=use_center,
+            use_left_right=use_left_right,
+            use_left_right_center=use_left_right_center,
+            use_left_lidar=use_left_lidar,
+            use_right_lidar=use_right_lidar,
             emulated_rgbd_fps=args.emulated_rgbd_fps,
             camera_fps=args.camera_fps,
             resolution_height=args.resolution,

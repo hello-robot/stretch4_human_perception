@@ -30,10 +30,10 @@ source venv/bin/activate
 
 When adding this repository as a depdendency in another package, we added console scripts (such as `install_dependencies.sh` and `setup_models.py`) that install as part of pip installing this repository that you can run from your project's python environment.
 
-1. Add this package to your project's dependencies list: `"stretch4-human-pose-estimation @ git+ssh://git@github.com/hello-robot/stretch4_human_pose_estimation.git"`
+1. Add this package to your project's dependencies list: `"stretch4-human-pose-estimation @ git+ssh://git@github.com/hello-robot/stretch4_human_perception.git"`
 2. Install your package package: `pip install -e .`
-3. Run the install script to setup the system hardware drivers (NPU and GPU), create a virtual environment, install the python package, and download all models: `human_pose_estimation_install_dependencies` or `python3 -m stretch4_human_pose_estimation.install_deps`
-4. You can also download models using `human_pose_estimation_setup_models` or `python3 -m stretch4_human_pose_estimation.install_deps --size all`
+3. Run the install script to setup the system hardware drivers (NPU and GPU), create a virtual environment, install the python package, and download all models: `install_dependencies.sh` or `python3 -m stretch4_human_pose_estimation.install_deps`
+4. You can also download models using `setup_models.py` or `python3 -m stretch4_human_pose_estimation.install_deps --size all`
 
 
 ## Downloading Models
@@ -43,13 +43,16 @@ The installation script automatically downloads all models by default. If you ne
 ```bash
 # Download the medium model (default)
 python3 setup_models.py
-
+```
+```bash
 # Download a specific model size
 python3 setup_models.py --size t
-
+```
+```bash
 # Print setup instructions for SAM 3.1
 python3 setup_models.py --sam3
-
+```
+```bash
 # Download all models and print SAM 3.1 setup instructions
 python3 setup_models.py --size all
 ```
@@ -63,13 +66,16 @@ Example scripts are provided to test the pose estimation pipeline with camera st
 ```bash
 # Run with default settings (Medium model, Left camera, AUTO device)
 python3 examples/rtmo_pose_estimation.py
-
-# Run the small model on the NPU using the center camera
-python3 examples/rtmo_pose_estimation.py --size s --device NPU --camera center
-
+```
+```bash
+# Run the large model on the GPU using the right camera
+python3 examples/rtmo_pose_estimation.py --size l --device GPU --camera right
+```
+```bash
 # Run on a directory of images
 python3 examples/rtmo_pose_estimation.py --dir /path/to/images
-
+```
+```bash
 # Run the stereo camera example (combines left and right camera streams side-by-side)
 python3 examples/stereo_rtmo_pose_estimation.py
 ```
@@ -80,7 +86,7 @@ We also provide an advanced example that uses the RGB-D camera streams to infer 
 
 ```bash
 # Run with left camera stream and visualize 3D skeletons
-python3 examples/rgbd_rtmo_pose_estimation.py --left
+python3 examples/rgbd_rtmo_pose_estimation.py --camera left --lidar left
 ```
 
 ### 3D RGB-D SAM 3.1 Body Segmentation (ReRun)
@@ -89,7 +95,7 @@ We provide an example that uses SAM 3.1 to segment people in the RGB-D camera st
 
 ```bash
 # Run with left camera stream and visualize SAM 3.1 segmentations
-python3 examples/rgbd_sam3_body_segmentation.py --left
+python3 examples/rgbd_sam3_body_segmentation.py --camera left --lidar left
 ```
 
 ### 3D Robot Body Prediction (ReRun)

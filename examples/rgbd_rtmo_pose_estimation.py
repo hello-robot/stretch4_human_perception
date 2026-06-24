@@ -386,7 +386,7 @@ def _log_3d_skeleton(i, res, c_name, frame, camera_matrix, dist_coeffs, T_cam_to
 
 def render_rgbd_rtmo(c_name: str, frame: RGBDFrame, pipeline: RTMOPipeline, style="cvpr", kpt_thr=0.3):
     rr.set_time("timestamp", timestamp=frame.timestamp)
-    image_bgr = frame.image_frame.image.copy()
+    image_bgr = frame.image.copy()
     orig_h, orig_w = image_bgr.shape[:2]
     
     if c_name == "left":
@@ -413,7 +413,7 @@ def render_rgbd_rtmo(c_name: str, frame: RGBDFrame, pipeline: RTMOPipeline, styl
             depth_vis = cv2.rotate(depth_vis, cv2.ROTATE_90_CLOCKWISE)
             
         dense_processor = DenseDepthImage(
-            frame.image_frame.image, 
+            frame.image, 
             frame.depth_image, 
             apply_validity_mask=True, 
             camera_name=c_name, 
@@ -491,14 +491,14 @@ def _parse_args():
 def main():
     args = _parse_args()
     show_fps = args.show_fps
-    use_left = args.left
-    use_right = args.right
-    use_center = args.center
-    use_left_right = args.left_right
-    use_left_right_center = args.left_right_center
-    use_both_lidars_default = not (args.lidar_left or args.lidar_right)
-    use_left_lidar = args.lidar_left or use_both_lidars_default
-    use_right_lidar = args.lidar_right or use_both_lidars_default
+    use_left = args.camera == "left"    
+    use_right = args.camera == "right"
+    use_center = args.camera == "center"
+    use_left_right = args.camera == "left_right"
+    use_left_right_center = args.camera == "all"
+    use_both_lidars_default = args.lidar == "both"
+    use_left_lidar = args.lidar == "left" or use_both_lidars_default
+    use_right_lidar = args.lidar == "right" or use_both_lidars_default
 
     print(f"Initializing RTMO Pipeline (Size: {args.size}, Device: {args.device})...")
     try:
