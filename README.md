@@ -28,7 +28,7 @@ source venv/bin/activate
 
 ### Installing this package as a dependency in another project
 
-When adding this repository as a depdendency in another package, we added console scripts (such as `human_pose_estimation_install_dependencies` and `human_pose_estimation_setup_models`) that install as part of pip installing this repository that you can run from your project's python environment.
+When adding this repository as a depdendency in another package, we added console scripts (such as `install_dependencies.sh` and `setup_models.py`) that install as part of pip installing this repository that you can run from your project's python environment.
 
 1. Add this package to your project's dependencies list: `"stretch4-human-pose-estimation @ git+ssh://git@github.com/hello-robot/stretch4_human_pose_estimation.git"`
 2. Install your package package: `pip install -e .`
