@@ -25,6 +25,17 @@ Activate the virtual environment before using the tools:
 source venv/bin/activate
 ```
 
+### Other Dependencies
+
+Please clone and install the following dependencies in the virtual environment associated with this package:
+
+Robot and External Desktop:
+- `stretch4_flying_gripper`: https://github.com/hello-robot/stretch4_flying_gripper
+- `stretch4_compliant_gripper` : https://github.com/hello-robot/stretch4_compliant_gripper
+- `stretch4_rgbd` : https://github.com/hello-robot/stretch4_rgbd
+
+Robot only:
+- `stretch4_pyhesai_wrapper` : https://github.com/hello-robot/stretch4_pyhesai_wrapper
 
 ### Installing this package as a dependency in another project
 
@@ -57,9 +68,34 @@ python3 setup_models.py --sam3
 python3 setup_models.py --size all
 ```
 
+### SAM3 Setup
+
+Please clone the SAM 3.1 repository and install it as described in its README: https://github.com/facebookresearch/sam3. You will need to request access for the SAM 3.1 model weights on [Hugging Face](https://huggingface.co/facebook/sam3) and authenticate using the Hugging Face CLI:
+
+```bash
+hf auth login
+```
+
+
 ## Running the Examples
 
 Example scripts are provided to test the pose estimation pipeline with camera streams, image directories, and 3D RGB-D projection. **Ensure your virtual environment is active** before running the examples.
+
+Run any demos using RTMO directly on the robot.
+
+Run any demos using SAM3 on a remote desktop. These require a high bandwidth connection between the robot and the desktop.
+
+### Key Scripts for Desktop & Robot Communication
+
+For any demos that use the external desktop computer, be sure to update the IP addresses in `stretch4_rgbd/rgbd_networking.py` and `stretch4_compliant_gripper/gripper_networking.py`. Run the following commands on the robot:
+
+```bash
+# robot control interface
+python3 stretch4_compliant_gripper/recv_and_execute_gripper_commands.py --remote
+
+# stream RGBD data
+python3 stretch4_rgbd/examples/send_rgbd_images_and_joint_states.py --remote
+```
 
 ### 2D Pose Estimation
 
