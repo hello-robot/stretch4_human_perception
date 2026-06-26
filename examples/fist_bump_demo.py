@@ -147,14 +147,13 @@ class FistBumpFSM:
                 self.send_zero_command()
                 self.state = State.FIND_HAND
             else:
-                kp_lift_arm = config.PROPORTIONAL_GAIN_LIFT_ARM_INIT
-                kp_wrist = config.PROPORTIONAL_GAIN_WRIST_INIT
+                kp = config.PROPORTIONAL_GAIN_INIT
                 j_cmds = {
-                    'lift': kp_lift_arm * err_lift,
-                    'arm': kp_lift_arm * err_arm,
-                    'wrist_yaw': kp_wrist * err_yaw,
-                    'wrist_pitch': -kp_wrist * err_pitch, # FIX FOR FUTURE ROBOTS
-                    'wrist_roll': -kp_wrist * err_roll # FIX FOR FUTURE ROBOTS
+                    'lift': kp * err_lift,
+                    'arm': kp * err_arm,
+                    'wrist_yaw': kp * err_yaw,
+                    'wrist_pitch': -kp * err_pitch, # FIX FOR FUTURE ROBOTS
+                    'wrist_roll': -kp * err_roll # FIX FOR FUTURE ROBOTS
                 }
                 self.send_velocity_and_grip_command(j_cmds, config.GRIPPER_CLOSE_POS_PCT)
                 
