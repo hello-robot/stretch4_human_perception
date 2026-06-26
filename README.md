@@ -43,8 +43,8 @@ When adding this repository as a depdendency in another package, we added consol
 
 1. Add this package to your project's dependencies list: `"stretch4-human-pose-estimation @ git+ssh://git@github.com/hello-robot/stretch4_human_perception.git"`
 2. Install your package package: `pip install -e .`
-3. Run the install script to setup the system hardware drivers (NPU and GPU), create a virtual environment, install the python package, and download all models: `install_dependencies.sh` or `python3 -m stretch4_human_pose_estimation.install_deps`
-4. You can also download models using `setup_models.py` or `python3 -m stretch4_human_pose_estimation.install_deps --size all`
+3. Run the install script to setup the system hardware drivers (NPU and GPU), create a virtual environment, install the python package, and download all models: `install_dependencies.sh` or `python3 -m stretch4_human_pose_estimation.utils.install_deps`
+4. You can also download models using `setup_models.py` or `python3 -m stretch4_human_pose_estimation.utils.install_deps --size all`
 
 
 ## Downloading Models
@@ -87,7 +87,7 @@ Run any demos using SAM3 on a remote desktop. These require a high bandwidth con
 
 ### Key Scripts for Desktop & Robot Communication
 
-For any demos that use the external desktop computer, be sure to update the IP addresses in `stretch4_rgbd/rgbd_networking.py` and `stretch4_compliant_gripper/gripper_networking.py`. Run the following commands on the robot:
+For any demos that use the external desktop computer, be sure to update the IP addresses in `stretch4_rgbd/rgbd_networking.py` and `stretch4_compliant_gripper/gripper_networking.py`. Run the following commands from the `stretch4_compliant_gripper` and `stretch4_rgbd` repositorie on the robot:
 
 ```bash
 # robot control interface
@@ -145,6 +145,26 @@ python3 examples/robot_body_prediction.py
 
 > [!NOTE]
 > This script natively integrates with the `stretch4_emulated_rgbd` package to provide high-performance, temporally synchronized streams. It will automatically load and apply any optimized Extrinsics calibration present for the current robot without requiring any additional command line arguments.
+
+### Moving Relative to Humans
+
+We provide two examples of moving Stretch 4 relative to human pose estimates from SAM 3.1. Be sure to run both of the scripts in the "Key Scripts for Desktop & Robot Communication" section above on the robot, and then run one of the following on a desktop computer:
+
+1. Follow a human around the room:
+
+```bash
+python3 examples/follow_person_demo.py --remote
+```
+
+The human following demonstation commands Stretch 4 to move its omnibase to follow a human around a room. **Note:** the robot will run into obstacles, but should stop when near the human.
+
+2. Give a human a fist bump:
+
+```bash
+python3 examples/fist_bump_demo.py --remote
+```
+
+The fist bump demonstration commands Stretch 4 to track a human's hand and to perform a "fist bump" motion when the user moves their hand upwards and towards the robot. In order to trigger the fist bump with the robot, the human must move their hand upwards and towards the robot. Detection of this gesture may not work consistently for different sized users; view the parameters beginning with `START_FIST_BUMP_` in `examples/fist_bump_demo_config.py` to adjust the detection thresholds.
 
 ## Python API
 
