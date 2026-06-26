@@ -91,7 +91,7 @@ GRIPPER_CLOSE_POS_PCT = 0.0
 # ==============================================================================
 
 # Proportional gain for Cartesian Tracking (mobile base rotation) during GET_READY_TO_FIST_BUMP state.
-PROPORTIONAL_GAIN_TRACKING_BASE = 0.5
+PROPORTIONAL_GAIN_TRACKING_BASE = 1.5
 
 # Proportional gain for Cartesian Tracking (lift) during GET_READY_TO_FIST_BUMP state.
 PROPORTIONAL_GAIN_TRACKING_LIFT = 4.0
