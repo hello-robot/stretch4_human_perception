@@ -368,7 +368,6 @@ def main():
     timeseries_views = [
         rrb.TimeSeriesView(name="Lift & Arm", origin="Telemetry/LiftArm"),
         rrb.TimeSeriesView(name="Wrist", origin="Telemetry/Wrist"),
-        rrb.TimeSeriesView(name="Head", origin="Telemetry/Head"),
     ]
 
     view_layout = rrb.Horizontal(
@@ -436,9 +435,6 @@ def main():
                 rr.log("Telemetry/Wrist/Yaw", rr.Scalars(closest_joint_state['wrist_yaw']['angle']))
                 rr.log("Telemetry/Wrist/Pitch", rr.Scalars(closest_joint_state['wrist_pitch']['angle']))
                 rr.log("Telemetry/Wrist/Roll", rr.Scalars(closest_joint_state['wrist_roll']['angle']))
-                
-                rr.log("Telemetry/Head/Pan", rr.Scalars(closest_joint_state['head_pan']['angle']))
-                rr.log("Telemetry/Head/Tilt", rr.Scalars(closest_joint_state['head_tilt']['angle']))
 
             c_name = frame.camera_type
             lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
