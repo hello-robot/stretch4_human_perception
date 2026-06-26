@@ -6,7 +6,7 @@ import numpy as np
 import rerun as rr
 import rerun.blueprint as rrb
 
-from stretch_body_ii.core.hello_utils import LoopTimer
+from stretch4_body.core.hello_utils import LoopTimer
 try:
     from stretch4_emulated_rgbd.api import get_emulated_rgbd_stream, DenseDepthImage, unproject_points
     from stretch4_emulated_rgbd.shared_utils import RGBDFrame
@@ -177,7 +177,7 @@ def _log_3d_pointcloud(i, res, c_name, frame, camera_matrix, dist_coeffs, T_cam_
 
 def render_rgbd_sam3(c_name: str, frame: RGBDFrame, pipeline: SAM3Pipeline):
     rr.set_time("timestamp", timestamp=frame.timestamp)
-    image_bgr = frame.image_frame.image.copy()
+    image_bgr = frame.image.copy()
     orig_h, orig_w = image_bgr.shape[:2]
     
     if c_name == "left":
@@ -204,7 +204,7 @@ def render_rgbd_sam3(c_name: str, frame: RGBDFrame, pipeline: SAM3Pipeline):
             depth_vis = cv2.rotate(depth_vis, cv2.ROTATE_90_CLOCKWISE)
             
         dense_processor = DenseDepthImage(
-            frame.image_frame.image, 
+            frame.image, 
             frame.depth_image, 
             apply_validity_mask=True, 
             camera_name=c_name, 
@@ -280,14 +280,14 @@ def _parse_args():
 def main():
     args = _parse_args()
     show_fps = args.show_fps
-    use_left = args.left
-    use_right = args.right
-    use_center = args.center
-    use_left_right = args.left_right
-    use_left_right_center = args.left_right_center
-    use_both_lidars_default = not (args.lidar_left or args.lidar_right)
-    use_left_lidar = args.lidar_left or use_both_lidars_default
-    use_right_lidar = args.lidar_right or use_both_lidars_default
+    use_left = args.camera == "left"
+    use_right = args.camera == "right"
+    use_center = args.camera == "center"
+    use_left_right = args.camera == "left_right"
+    use_left_right_center = args.camera == "all"
+    use_both_lidars_default = args.lidar == "both"
+    use_left_lidar = args.lidar == "left" or use_both_lidars_default
+    use_right_lidar = args.lidar == "right" or use_both_lidars_default
 
     print(f"Initializing SAM 3.1 Pipeline (Prompt: {args.prompt})...")
     try:

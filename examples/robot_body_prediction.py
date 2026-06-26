@@ -147,10 +147,7 @@ def main():
                 # wrist roll direction needs to be flipped when run on Calder 4010
                 update_joint("joint_wrist_roll", -closest_joint_state['wrist_roll']['angle'])
                 ############################################################################
-                
-                update_joint("joint_head_pan", closest_joint_state['head_pan']['angle'])
-                update_joint("joint_head_tilt", closest_joint_state['head_tilt']['angle'])
-                
+
                 # Compute forward kinematics and update the 3D placements of all frames
                 pin.forwardKinematics(model, data, q)
                 pin.updateFramePlacements(model, data)

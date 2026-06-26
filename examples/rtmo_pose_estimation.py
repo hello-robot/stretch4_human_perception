@@ -26,7 +26,7 @@ def process_and_display(pipeline: RTMOPipeline, image, window_name="RTMO Pose Es
     return cv2.waitKey(1)
 
 def run_camera(pipeline: RTMOPipeline, camera_name: str, display_text=None, style="cvpr"):
-    import stretch_body_ii.subsystem.cameras as cameras
+    import stretch4_body.subsystem.cameras as cameras
     
     print(f"Starting camera stream from '{camera_name}'...")
     

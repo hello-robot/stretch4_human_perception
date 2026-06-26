@@ -1,11 +1,11 @@
 # Stretch 4 Human Perception
 
-This repository provides tools and examples for performing real-time human pose estimation on the Stretch 4 mobile manipulator. It is standardized around the RTMO series of models via OpenVINO for fast, robust inference on edge devices (including CPU, GPU, and NPU), and now also supports SAM 3.1 for high-quality zero-shot segmentation.
+This repository provides tools and examples for performing real-time human pose estimation on the Stretch 4 mobile manipulator. It primarily uses the RTMO series of models via OpenVINO for inference on edge devices (including CPU, GPU, and NPU), and SAM 3.1 for segmentation.
 
 > [!NOTE]
-> OpenVINO runs seamlessly on any x86_64 CPU (including AMD CPUs). Hardware-specific execution like `--device NPU` or `--device GPU` within standard OpenVINO builds requires compatible Intel hardware. On desktop setups with AMD CPUs or NVIDIA GPUs, use the default `--device AUTO` or `--device CPU`.
+> OpenVINO runs on any x86_64 compatible CPU. Hardware-specific execution like `--device NPU` or `--device GPU` within standard OpenVINO builds requires compatible Intel hardware. On desktop setups with AMD CPUs or NVIDIA GPUs, use the default `--device AUTO` or `--device CPU`.
 > 
-> **Important NPU Notice:** Due to a known OpenVINO compiler bug with the dynamic Non-Max Suppression (NMS) operators used in RTMO, running these models on the Intel NPU currently produces empty or garbage bounding boxes. If you specify `--device NPU`, the pipeline will automatically detect this limitation and safely fall back to the **GPU**, which executes the model flawlessly with full hardware acceleration.
+> **Important NPU Notice:** Due to a known OpenVINO compiler bug with the dynamic Non-Max Suppression (NMS) operators used in RTMO, running these models on the Intel NPU currently produces empty or garbage bounding boxes. If you specify `--device NPU`, the pipeline will automatically detect this limitation and safely fall back to the **GPU**, which executes the model with hardware acceleration.
 
 ## Installation
 
@@ -25,15 +25,26 @@ Activate the virtual environment before using the tools:
 source venv/bin/activate
 ```
 
+### Other Dependencies
+
+Please clone and install the following dependencies in the virtual environment associated with this package:
+
+Robot and External Desktop:
+- `stretch4_flying_gripper`: https://github.com/hello-robot/stretch4_flying_gripper
+- `stretch4_compliant_gripper` : https://github.com/hello-robot/stretch4_compliant_gripper
+- `stretch4_rgbd` : https://github.com/hello-robot/stretch4_rgbd
+
+Robot only:
+- `stretch4_pyhesai_wrapper` : https://github.com/hello-robot/stretch4_pyhesai_wrapper
 
 ### Installing this package as a dependency in another project
 
-When adding this repository as a depdendency in another package, we added console scripts (such as `human_pose_estimation_install_dependencies` and `human_pose_estimation_setup_models`) that install as part of pip installing this repository that you can run from your project's python environment.
+When adding this repository as a depdendency in another package, we added console scripts (such as `install_dependencies.sh` and `setup_models.py`) that install as part of pip installing this repository that you can run from your project's python environment.
 
-1. Add this package to your project's dependencies list: `"stretch4-human-pose-estimation @ git+ssh://git@github.com/hello-robot/stretch4_human_pose_estimation.git"`
+1. Add this package to your project's dependencies list: `"stretch4-human-pose-estimation @ git+ssh://git@github.com/hello-robot/stretch4_human_perception.git"`
 2. Install your package package: `pip install -e .`
-3. Run the install script to setup the system hardware drivers (NPU and GPU), create a virtual environment, install the python package, and download all models: `human_pose_estimation_install_dependencies` or `python3 -m stretch4_human_pose_estimation.install_deps`
-4. You can also download models using `human_pose_estimation_setup_models` or `python3 -m stretch4_human_pose_estimation.install_deps --size all`
+3. Run the install script to setup the system hardware drivers (NPU and GPU), create a virtual environment, install the python package, and download all models: `install_dependencies.sh` or `python3 -m stretch4_human_pose_estimation.install_deps`
+4. You can also download models using `setup_models.py` or `python3 -m stretch4_human_pose_estimation.install_deps --size all`
 
 
 ## Downloading Models
@@ -43,33 +54,64 @@ The installation script automatically downloads all models by default. If you ne
 ```bash
 # Download the medium model (default)
 python3 setup_models.py
-
+```
+```bash
 # Download a specific model size
 python3 setup_models.py --size t
-
+```
+```bash
 # Print setup instructions for SAM 3.1
 python3 setup_models.py --sam3
-
+```
+```bash
 # Download all models and print SAM 3.1 setup instructions
 python3 setup_models.py --size all
 ```
 
+### SAM3 Setup
+
+Please clone the SAM 3.1 repository and install it as described in its README: https://github.com/facebookresearch/sam3. You will need to request access for the SAM 3.1 model weights on [Hugging Face](https://huggingface.co/facebook/sam3) and authenticate using the Hugging Face CLI:
+
+```bash
+hf auth login
+```
+
+
 ## Running the Examples
 
 Example scripts are provided to test the pose estimation pipeline with camera streams, image directories, and 3D RGB-D projection. **Ensure your virtual environment is active** before running the examples.
+
+Run any demos using RTMO directly on the robot.
+
+Run any demos using SAM3 on a remote desktop. These require a high bandwidth connection between the robot and the desktop.
+
+### Key Scripts for Desktop & Robot Communication
+
+For any demos that use the external desktop computer, be sure to update the IP addresses in `stretch4_rgbd/rgbd_networking.py` and `stretch4_compliant_gripper/gripper_networking.py`. Run the following commands on the robot:
+
+```bash
+# robot control interface
+python3 stretch4_compliant_gripper/recv_and_execute_gripper_commands.py --remote
+
+# stream RGBD data
+python3 stretch4_rgbd/examples/send_rgbd_images_and_joint_states.py --remote
+```
 
 ### 2D Pose Estimation
 
 ```bash
 # Run with default settings (Medium model, Left camera, AUTO device)
 python3 examples/rtmo_pose_estimation.py
-
-# Run the small model on the NPU using the center camera
-python3 examples/rtmo_pose_estimation.py --size s --device NPU --camera center
-
+```
+```bash
+# Run the large model on the GPU using the right camera
+python3 examples/rtmo_pose_estimation.py --size l --device GPU --camera right
+```
+```bash
 # Run on a directory of images
 python3 examples/rtmo_pose_estimation.py --dir /path/to/images
-
+```
+```bash
 # Run the stereo camera example (combines left and right camera streams side-by-side)
 python3 examples/stereo_rtmo_pose_estimation.py
 ```
@@ -80,7 +122,7 @@ We also provide an advanced example that uses the RGB-D camera streams to infer 
 
 ```bash
 # Run with left camera stream and visualize 3D skeletons
-python3 examples/rgbd_rtmo_pose_estimation.py --left
+python3 examples/rgbd_rtmo_pose_estimation.py --camera left --lidar left
 ```
 
 ### 3D RGB-D SAM 3.1 Body Segmentation (ReRun)
@@ -89,7 +131,7 @@ We provide an example that uses SAM 3.1 to segment people in the RGB-D camera st
 
 ```bash
 # Run with left camera stream and visualize SAM 3.1 segmentations
-python3 examples/rgbd_sam3_body_segmentation.py --left
+python3 examples/rgbd_sam3_body_segmentation.py --camera left --lidar left
 ```
 
 ### 3D Robot Body Prediction (ReRun)

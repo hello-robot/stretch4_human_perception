@@ -297,6 +297,29 @@ class ContinuousSAM3VideoPipeline:
                 batch.img_batch[idx_to_prune] = None
                 batch.find_inputs[idx_to_prune] = None
                 inference_state["previous_stages_out"][idx_to_prune] = None
+                
+                # Prune cached frame outputs (masks)
+                if "cached_frame_outputs" in inference_state:
+                    inference_state["cached_frame_outputs"].pop(idx_to_prune, None)
+                
+                # Prune tracker state history
+                for tracker_state in inference_state["tracker_inference_states"]:
+                    output_dict = tracker_state.get("output_dict", {})
+                    if "non_cond_frame_outputs" in output_dict:
+                        output_dict["non_cond_frame_outputs"].pop(idx_to_prune, None)
+                    
+                    if "frames_already_tracked" in tracker_state:
+                        tracker_state["frames_already_tracked"].pop(idx_to_prune, None)
+                        
+                    consolidated = tracker_state.get("consolidated_frame_inds", {})
+                    if "non_cond_frame_outputs" in consolidated:
+                        consolidated["non_cond_frame_outputs"].discard(idx_to_prune)
+                        
+                    output_dict_per_obj = tracker_state.get("output_dict_per_obj", {})
+                    for obj_idx in output_dict_per_obj:
+                        obj_out = output_dict_per_obj[obj_idx]
+                        if "non_cond_frame_outputs" in obj_out:
+                            obj_out["non_cond_frame_outputs"].pop(idx_to_prune, None)
 
     def add_text_prompt(self, inference_state, frame_idx, obj_id, text):
         """Set the text prompt for the video sequence."""
