@@ -147,13 +147,14 @@ class FistBumpFSM:
                 self.send_zero_command()
                 self.state = State.FIND_HAND
             else:
-                kp = config.PROPORTIONAL_GAIN_INIT
+                kp_lift_arm = config.PROPORTIONAL_GAIN_LIFT_ARM_INIT
+                kp_wrist = config.PROPORTIONAL_GAIN_WRIST_INIT
                 j_cmds = {
-                    'lift': kp * err_lift,
-                    'arm': kp * err_arm,
-                    'wrist_yaw': kp * err_yaw,
-                    'wrist_pitch': -kp * err_pitch, # FIX FOR FUTURE ROBOTS
-                    'wrist_roll': -kp * err_roll # FIX FOR FUTURE ROBOTS
+                    'lift': kp_lift_arm * err_lift,
+                    'arm': kp_lift_arm * err_arm,
+                    'wrist_yaw': kp_wrist * err_yaw,
+                    'wrist_pitch': -kp_wrist * err_pitch, # FIX FOR FUTURE ROBOTS
+                    'wrist_roll': -kp_wrist * err_roll # FIX FOR FUTURE ROBOTS
                 }
                 self.send_velocity_and_grip_command(j_cmds, config.GRIPPER_CLOSE_POS_PCT)
                 
@@ -368,7 +369,6 @@ def main():
     timeseries_views = [
         rrb.TimeSeriesView(name="Lift & Arm", origin="Telemetry/LiftArm"),
         rrb.TimeSeriesView(name="Wrist", origin="Telemetry/Wrist"),
-        rrb.TimeSeriesView(name="Head", origin="Telemetry/Head"),
     ]
 
     view_layout = rrb.Horizontal(
@@ -447,9 +447,6 @@ def main():
                 rr.log("Telemetry/Wrist/Pitch", rr.Scalars(closest_joint_state['wrist_pitch']['angle']))
                 rr.log("Telemetry/Wrist/Roll", rr.Scalars(closest_joint_state['wrist_roll']['angle']))
                 
-                rr.log("Telemetry/Head/Pan", rr.Scalars(closest_joint_state['head_pan']['angle']))
-                rr.log("Telemetry/Head/Tilt", rr.Scalars(closest_joint_state['head_tilt']['angle']))
-
                 # Update kinematics
                 def update_joint(joint_name, val):
                     if model.existJointName(joint_name):
@@ -461,8 +458,6 @@ def main():
                 update_joint("joint_wrist_yaw", closest_joint_state['wrist_yaw']['angle'])
                 update_joint("joint_wrist_pitch", -closest_joint_state['wrist_pitch']['angle'])
                 update_joint("joint_wrist_roll", -closest_joint_state['wrist_roll']['angle'])
-                update_joint("joint_head_pan", closest_joint_state['head_pan']['angle'])
-                update_joint("joint_head_tilt", closest_joint_state['head_tilt']['angle'])
                 
                 pin.forwardKinematics(model, data, q)
                 pin.updateFramePlacements(model, data)

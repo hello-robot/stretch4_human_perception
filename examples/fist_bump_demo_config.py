@@ -68,7 +68,8 @@ INIT_TOLERANCE_DEG = 2.0  # degrees
 INIT_TOLERANCE_M = 0.01    # meters (10 mm)
 
 # Proportional gain for Joint-Space velocity control during INITIALIZE state.
-PROPORTIONAL_GAIN_INIT = 2.0
+PROPORTIONAL_GAIN_LIFT_ARM_INIT = 2.0
+PROPORTIONAL_GAIN_WRIST_INIT = 0.05
 
 # Position (percentage) to set the gripper to during the initialization and 
 # reaching phases. 0.0 is fully closed, 100.0 is fully open.
@@ -91,7 +92,7 @@ GRIPPER_CLOSE_POS_PCT = 0.0
 # ==============================================================================
 
 # Proportional gain for Cartesian Tracking (mobile base rotation) during GET_READY_TO_FIST_BUMP state.
-PROPORTIONAL_GAIN_TRACKING_BASE = 1.5
+PROPORTIONAL_GAIN_TRACKING_BASE = 0.5
 
 # Proportional gain for Cartesian Tracking (lift) during GET_READY_TO_FIST_BUMP state.
 PROPORTIONAL_GAIN_TRACKING_LIFT = 4.0
