@@ -77,7 +77,7 @@ hf auth login
 ```
 
 
-## Running the Examples
+## Running Examples
 
 Example scripts are provided to test the pose estimation pipeline with camera streams, image directories, and 3D RGB-D projection. **Ensure your virtual environment is active** before running the examples.
 
@@ -87,7 +87,7 @@ Run any demos using SAM3 on a remote desktop. These require a high bandwidth con
 
 ### Key Scripts for Desktop & Robot Communication
 
-For any demos that use the external desktop computer, be sure to update the IP addresses in `stretch4_rgbd/rgbd_networking.py` and `stretch4_compliant_gripper/gripper_networking.py`. Run the following commands from the `stretch4_compliant_gripper` and `stretch4_rgbd` repositorie on the robot:
+For any demos that use the external desktop computer, be sure to update the IP addresses in `stretch4_rgbd/rgbd_networking.py` and `stretch4_compliant_gripper/gripper_networking.py`. Run the following commands from the `stretch4_compliant_gripper` and `stretch4_rgbd` repositories on the robot:
 
 ```bash
 # robot control interface
@@ -97,8 +97,15 @@ python3 stretch4_compliant_gripper/recv_and_execute_gripper_commands.py --remote
 python3 stretch4_rgbd/examples/send_rgbd_images_and_joint_states.py --remote
 ```
 
-### 2D Pose Estimation
+### 2D Pose Estimation: Robot Local
 
+Terminal 1 (robot):
+```bash
+# stream RGBD data locally
+python3 stretch4_rgbd/examples/send_rgbd_images_and_joint_states.py
+```
+
+Terminal 2 (robot): choose 1 of the following scripts:
 ```bash
 # Run with default settings (Medium model, Left camera, AUTO device)
 python3 examples/rtmo_pose_estimation.py
@@ -111,42 +118,90 @@ python3 examples/rtmo_pose_estimation.py --size l --device GPU --camera right
 # Run on a directory of images
 python3 examples/rtmo_pose_estimation.py --dir /path/to/images
 ```
+
+<!-- NOTE the below does not work yet? -->
 ```bash
 # Run the stereo camera example (combines left and right camera streams side-by-side)
 python3 examples/stereo_rtmo_pose_estimation.py
 ```
 
-### 3D RGB-D Pose Estimation (ReRun)
+### 3D RGB-D Pose Estimation (ReRun): Robot Local
 
 We also provide an advanced example that uses the RGB-D camera streams to infer and visualize 3D human pose keypoints alongside the point cloud in ReRun.
 
+Terminal 1 (robot):
 ```bash
 # Run with left camera stream and visualize 3D skeletons
 python3 examples/rgbd_rtmo_pose_estimation.py --camera left --lidar left
 ```
 
-### 3D RGB-D SAM 3.1 Body Segmentation (ReRun)
+### 3D RGB-D SAM 3.1 Body Segmentation (ReRun): Robot + Desktop
 
 We provide an example that uses SAM 3.1 to segment people in the RGB-D camera streams and visualize the 2D masks and 3D point clouds in ReRun.
 
+Terminal 1 (robot):
 ```bash
-# Run with left camera stream and visualize SAM 3.1 segmentations
-python3 examples/rgbd_sam3_body_segmentation.py --camera left --lidar left
+# stream RGBD data remotely
+python3 stretch4_rgbd/examples/send_rgbd_images_and_joint_states.py --remote
 ```
 
-### 3D Robot Body Prediction (ReRun)
+Terminal 2 (desktop):
+```bash
+# Run with left camera stream and visualize SAM 3.1 segmentations
+python3 recv_and_sam3_rgbd.py --remote --tracking --prompt "people"
+```
+
+The script on the desktop has many options for further processing the segmented humans. For example, mediapipe can be used to infer human skeleton, face, and hand keypoints by adding the following flags:
+
+```bash
+# 2D pose estimation
+--mediapipe_body
+# 2D hand pose estimation
+--mediapipe_hands
+# 2D face pose estimation
+--mediapipe_faces
+# simultaneously estimates pose, face, and hands
+--mediapipe_holistic  
+```
+
+The script `recv_and_sam3_rgbd_simple.py` strips away the additional options for pose processing as a minimal example.
+
+### 3D Robot Body Prediction (ReRun): Robot Local or Robot + Desktop
 
 We also provide an example that tracks the robot's physical links using time-synchronized joint states, computing exact 3D Cartesian coordinates with Pinocchio and visualizing them against the RGB-D point cloud in ReRun.
 
+#### Example usage on the robot:
+
+Terminal 1 (robot):
+```bash
+# stream RGBD data locally
+python3 stretch4_rgbd/examples/send_rgbd_images_and_joint_states.py
+```
+
+Terminal 2 (robot):
 ```bash
 # Run to visualize the robot links and coordinate frames inside the point cloud
 python3 examples/robot_body_prediction.py
 ```
 
+#### Example usage on the robot and desktop:
+
+Terminal 1 (robot):
+```bash
+# stream RGBD data remotely
+python3 stretch4_rgbd/examples/send_rgbd_images_and_joint_states.py --remote
+```
+
+Terminal 2 (desktop):
+```bash
+# Run to visualize the robot links and coordinate frames inside the point cloud
+python3 examples/robot_body_prediction.py --remote
+```
+
 > [!NOTE]
 > This script natively integrates with the `stretch4_emulated_rgbd` package to provide high-performance, temporally synchronized streams. It will automatically load and apply any optimized Extrinsics calibration present for the current robot without requiring any additional command line arguments.
 
-### Moving Relative to Humans
+### Moving Relative to Humans: Robot + Desktop
 
 We provide two examples of moving Stretch 4 relative to human pose estimates from SAM 3.1. Be sure to run both of the scripts in the "Key Scripts for Desktop & Robot Communication" section above on the robot, and then run one of the following on a desktop computer:
 
