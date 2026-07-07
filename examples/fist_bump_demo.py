@@ -16,7 +16,7 @@ import pinocchio as pin
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from stretch4_emulated_rgbd.shared_utils import RGBDFrame
+    from stretch4_emulated_rgbd.shared_utils import RGBDFrame, MultiRGBDFrame
     from stretch4_emulated_rgbd.api import visualize_rgbd_frame, ValidityMaskManager, project_base_link_points_to_image
     from stretch4_emulated_rgbd import rgbd_networking as gn
 except ImportError:
@@ -409,7 +409,7 @@ def main():
     try:
         while True:
             output_dict = sub_socket.recv_pyobj()
-            frame = RGBDFrame.from_dict(output_dict)
+            multi_frame = MultiRGBDFrame.from_dict(output_dict)
             
             if mask_manager is None:
                 robot_id = output_dict.get('robot_id')
@@ -423,14 +423,7 @@ def main():
             closest_joint_state = output_dict.get('closest_joint_state', None)
             
             frames_received += 1
-            img_seq = frame.image_frame.frame_number
-            if img_seq is not None:
-                if last_seq_num is not None:
-                    dropped = img_seq - last_seq_num - 1
-                    if dropped > 0:
-                        dropped_messages += dropped
-                last_seq_num = img_seq
-                
+            
             grasp_center_pos = None
             grasp_center_rot = None
             
@@ -483,52 +476,74 @@ def main():
                         ],
                         radii=[axes_radius, axes_radius, axes_radius]
                     ))
-                    
-                    c_name = frame.camera_type
-                    if frame.T_base_to_cam is not None:
-                        pts_to_project = np.array([grasp_center_pos,
-                                                   grasp_center_pos + rotation[:, 0] * axes_length,
-                                                   grasp_center_pos + rotation[:, 1] * axes_length,
-                                                   grasp_center_pos + rotation[:, 2] * axes_length])
-                        img_pts, valid_mask, pts_cam = project_base_link_points_to_image(
-                            pts_to_project, 
-                            frame.T_base_to_cam, 
-                            frame.camera_matrix, 
-                            frame.distortion_coefficients
-                        )
-                        
-                        if valid_mask[0]:
-                            Z = pts_cam[0, 2]
-                            f_x = frame.camera_matrix[0, 0]
-                            pixel_radius = max(1.0, (config.GRASP_CENTER_SPHERE_RADIUS_M * f_x) / Z)
-                            rr.log(f"Cameras/{c_name}/predicted_robot_body_overlay/link_grasp_center", rr.Points2D(img_pts[0:1], colors=[[255, 255, 0]], radii=[pixel_radius]))
-                            
-                            if np.all(valid_mask):
-                                pixel_axis_radius = max(1.0, (config.GRASP_CENTER_FRAME_AXIS_RADIUS_M * f_x) / Z)
-                                strips = [
-                                    [img_pts[0], img_pts[1]],
-                                    [img_pts[0], img_pts[2]],
-                                    [img_pts[0], img_pts[3]]
-                                ]
-                                colors = [[255, 0, 0], [0, 255, 0], [0, 0, 255]]
-                                rr.log(f"Cameras/{c_name}/predicted_robot_body_overlay/link_grasp_center_frame", rr.LineStrips2D(
-                                    strips, colors=colors, radii=[pixel_axis_radius, pixel_axis_radius, pixel_axis_radius]
-                                ))
 
-            c_name = frame.camera_type
-            lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
+            frames = []
+            if multi_frame.left: frames.append(multi_frame.left)
+            if multi_frame.right: frames.append(multi_frame.right)
+            if multi_frame.center: frames.append(multi_frame.center)
             
-            # Log RGBD frames to rerun
-            vig_mask, depth_mask = mask_manager.get_masks(c_name, lidar_str, frame.image.shape)
-            visualize_rgbd_frame(c_name, frame, vig_mask=vig_mask, depth_mask=depth_mask)
+            all_hands_3d_info = {}
+            
+            for frame in frames:
+                img_seq = frame.image_frame.frame_number
+                if img_seq is not None:
+                    if last_seq_num is not None:
+                        dropped = img_seq - last_seq_num - 1
+                        if dropped > 0:
+                            dropped_messages += dropped
+                    last_seq_num = img_seq
+                    
+                c_name = frame.camera_type
+                lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
+                
+                if grasp_center_pos is not None and frame.T_base_to_cam is not None:
+                    axes_length = config.GRASP_CENTER_FRAME_AXIS_LENGTH_M
+                    pts_to_project = np.array([grasp_center_pos,
+                                               grasp_center_pos + rotation[:, 0] * axes_length,
+                                               grasp_center_pos + rotation[:, 1] * axes_length,
+                                               grasp_center_pos + rotation[:, 2] * axes_length])
+                    img_pts, valid_mask, pts_cam = project_base_link_points_to_image(
+                        pts_to_project, 
+                        frame.T_base_to_cam, 
+                        frame.camera_matrix, 
+                        frame.distortion_coefficients
+                    )
+                    
+                    if valid_mask[0]:
+                        Z = pts_cam[0, 2]
+                        f_x = frame.camera_matrix[0, 0]
+                        pixel_radius = max(1.0, (config.GRASP_CENTER_SPHERE_RADIUS_M * f_x) / Z)
+                        rr.log(f"Cameras/{c_name}/predicted_robot_body_overlay/link_grasp_center", rr.Points2D(img_pts[0:1], colors=[[255, 255, 0]], radii=[pixel_radius]))
+                        
+                        if np.all(valid_mask):
+                            pixel_axis_radius = max(1.0, (config.GRASP_CENTER_FRAME_AXIS_RADIUS_M * f_x) / Z)
+                            strips = [
+                                [img_pts[0], img_pts[1]],
+                                [img_pts[0], img_pts[2]],
+                                [img_pts[0], img_pts[3]]
+                            ]
+                            colors = [[255, 0, 0], [0, 255, 0], [0, 0, 255]]
+                            rr.log(f"Cameras/{c_name}/predicted_robot_body_overlay/link_grasp_center_frame", rr.LineStrips2D(
+                                strips, colors=colors, radii=[pixel_axis_radius, pixel_axis_radius, pixel_axis_radius]
+                            ))
 
-            hands_3d_info, orig_w, orig_h = tracker.process_frame(frame, depth_mask=depth_mask)
+                # Log RGBD frames to rerun
+                vig_mask, depth_mask = mask_manager.get_masks(c_name, lidar_str, frame.image.shape)
+                visualize_rgbd_frame(c_name, frame, vig_mask=vig_mask, depth_mask=depth_mask)
+
+                hands_3d_info, orig_w, orig_h = tracker.process_frame(frame, depth_mask=depth_mask)
+                for hid, info in hands_3d_info.items():
+                    all_hands_3d_info[f"{c_name}_{hid}"] = info
             
             # --- FSM Update ---
-            target_id = fsm.update(hands_3d_info, grasp_center_pos, grasp_center_rot, closest_joint_state)
+            target_id_str = fsm.update(all_hands_3d_info, grasp_center_pos, grasp_center_rot, closest_joint_state)
             
-            if target_id is not None:
-                rr.log(f"SegmentedPeople/{c_name}/person_{target_id}_center/status", rr.TextDocument(f"TARGET ({fsm.state.name})"))
+            if target_id_str is not None:
+                try:
+                    target_c_name, target_hid = target_id_str.split('_', 1)
+                    rr.log(f"SegmentedPeople/{target_c_name}/person_{target_hid}_center/status", rr.TextDocument(f"TARGET ({fsm.state.name})"))
+                except ValueError:
+                    pass
             
             # Print stats
             current_time = time.time()

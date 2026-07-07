@@ -17,6 +17,13 @@ COLORS = [
 ]
 
 def remap_coordinate(u, v, c_name, orig_w, orig_h):
+    try:
+        import stretch4_emulated_rgbd.emulated_rgbd_config as config_rgbd
+        if config_rgbd.ROTATE_IMAGES_TO_VERTICAL:
+            return u, v
+    except ImportError:
+        pass
+
     if c_name == "left":
         return orig_w - 1.0 - v, u
     elif c_name == "right":
@@ -44,10 +51,17 @@ class SegmentedObjectTracker:
         orig_h, orig_w = image_bgr.shape[:2]
         
         # Unrotate if left/right to pass upright image to SAM
-        if c_name == "left":
-            image_bgr = cv2.rotate(image_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        elif c_name == "right":
-            image_bgr = cv2.rotate(image_bgr, cv2.ROTATE_90_CLOCKWISE)
+        try:
+            import stretch4_emulated_rgbd.emulated_rgbd_config as config_rgbd
+            should_rotate = not config_rgbd.ROTATE_IMAGES_TO_VERTICAL
+        except ImportError:
+            should_rotate = True
+
+        if should_rotate:
+            if c_name == "left":
+                image_bgr = cv2.rotate(image_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            elif c_name == "right":
+                image_bgr = cv2.rotate(image_bgr, cv2.ROTATE_90_CLOCKWISE)
             
         if c_name not in self.inference_states:
             self.inference_states[c_name] = self.pipeline.init_state()

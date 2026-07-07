@@ -18,7 +18,7 @@ import robot_body_predictions_config as config
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from stretch4_emulated_rgbd.shared_utils import RGBDFrame
+    from stretch4_emulated_rgbd.shared_utils import RGBDFrame, MultiRGBDFrame
     from stretch4_emulated_rgbd.api import visualize_rgbd_frame, ValidityMaskManager, project_base_link_points_to_image
     from stretch4_emulated_rgbd import rgbd_networking as gn
 except ImportError:
@@ -108,7 +108,7 @@ def main():
     try:
         while True:
             output_dict = sub_socket.recv_pyobj()
-            frame = RGBDFrame.from_dict(output_dict)
+            multi_frame = MultiRGBDFrame.from_dict(output_dict)
             
             if mask_manager is None:
                 robot_id = output_dict.get('robot_id')
@@ -185,74 +185,80 @@ def main():
                             radii=[axes_radius, axes_radius, axes_radius]
                         ))
             
-            c_name = frame.camera_type
-            lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
-            
-            vig_mask, depth_mask = mask_manager.get_masks(c_name, lidar_str, frame.image.shape)
-            visualize_rgbd_frame(c_name, frame, vig_mask=vig_mask, depth_mask=depth_mask)
-            
-            # Also render the link origins and frames as an overlay on the camera image
-            if closest_joint_state is not None and frame.T_base_to_cam is not None:
-                for link_name, params in config.VISUALIZED_LINKS.items():
-                    if model.existFrame(link_name):
-                        frame_id = model.getFrameId(link_name)
-                        translation_base = data.oMf[frame_id].translation
-                        rotation_base = data.oMf[frame_id].rotation
-                        
-                        show_frame = params.get("show_frame", False)
-                        axes_length = params.get("frame_axis_length_m", 0.1)
-                        
-                        # Prepare points to project: [origin, x_end, y_end, z_end]
-                        pts_to_project = [translation_base]
-                        if show_frame:
-                            pts_to_project.append(translation_base + rotation_base[:, 0] * axes_length)
-                            pts_to_project.append(translation_base + rotation_base[:, 1] * axes_length)
-                            pts_to_project.append(translation_base + rotation_base[:, 2] * axes_length)
+            frames = []
+            if multi_frame.left: frames.append(multi_frame.left)
+            if multi_frame.right: frames.append(multi_frame.right)
+            if multi_frame.center: frames.append(multi_frame.center)
+
+            for frame in frames:
+                c_name = frame.camera_type
+                lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
+                
+                vig_mask, depth_mask = mask_manager.get_masks(c_name, lidar_str, frame.image.shape)
+                visualize_rgbd_frame(c_name, frame, vig_mask=vig_mask, depth_mask=depth_mask)
+                
+                # Also render the link origins and frames as an overlay on the camera image
+                if closest_joint_state is not None and frame.T_base_to_cam is not None:
+                    for link_name, params in config.VISUALIZED_LINKS.items():
+                        if model.existFrame(link_name):
+                            frame_id = model.getFrameId(link_name)
+                            translation_base = data.oMf[frame_id].translation
+                            rotation_base = data.oMf[frame_id].rotation
                             
-                        pts_to_project_np = np.array(pts_to_project)
-                        
-                        # Use the 2D projection function which accurately handles fisheye distortion
-                        img_pts, valid_mask, pts_cam = project_base_link_points_to_image(
-                            pts_to_project_np, 
-                            frame.T_base_to_cam, 
-                            frame.camera_matrix, 
-                            frame.distortion_coefficients
-                        )
-                        
-                        if valid_mask[0]:  # Only render if the origin is in front of the camera
-                            color = params.get("sphere_color", [255, 255, 255])
+                            show_frame = params.get("show_frame", False)
+                            axes_length = params.get("frame_axis_length_m", 0.1)
                             
-                            # Convert physical radius to pixel radius based on depth (Z) and focal length (f_x)
-                            Z = pts_cam[0, 2]
-                            f_x = frame.camera_matrix[0, 0]
-                            
-                            physical_radius = params.get("sphere_radius_m", 0.05)
-                            pixel_radius = max(1.0, (physical_radius * f_x) / Z)
-                            
-                            # Log 2D Point
-                            rr.log(f"Cameras/{c_name}/predicted_robot_body_overlay/{link_name}", rr.Points2D(img_pts[0:1], colors=[color], radii=[pixel_radius]))
-                            
-                            if show_frame and np.all(valid_mask):
-                                physical_axis_radius = params.get("frame_axis_radius_m", 0.005)
-                                pixel_axis_radius = max(1.0, (physical_axis_radius * f_x) / Z)
+                            # Prepare points to project: [origin, x_end, y_end, z_end]
+                            pts_to_project = [translation_base]
+                            if show_frame:
+                                pts_to_project.append(translation_base + rotation_base[:, 0] * axes_length)
+                                pts_to_project.append(translation_base + rotation_base[:, 1] * axes_length)
+                                pts_to_project.append(translation_base + rotation_base[:, 2] * axes_length)
                                 
-                                strips = [
-                                    [img_pts[0], img_pts[1]], # Origin to X
-                                    [img_pts[0], img_pts[2]], # Origin to Y
-                                    [img_pts[0], img_pts[3]]  # Origin to Z
-                                ]
-                                colors = [
-                                    [255, 0, 0],
-                                    [0, 255, 0],
-                                    [0, 0, 255]
-                                ]
+                            pts_to_project_np = np.array(pts_to_project)
+                            
+                            # Use the 2D projection function which accurately handles fisheye distortion
+                            img_pts, valid_mask, pts_cam = project_base_link_points_to_image(
+                                pts_to_project_np, 
+                                frame.T_base_to_cam, 
+                                frame.camera_matrix, 
+                                frame.distortion_coefficients
+                            )
+                            
+                            if valid_mask[0]:  # Only render if the origin is in front of the camera
+                                color = params.get("sphere_color", [255, 255, 255])
                                 
-                                # Log 2D Line Strips
-                                rr.log(f"Cameras/{c_name}/predicted_robot_body_overlay/{link_name}_frame", rr.LineStrips2D(
-                                    strips,
-                                    colors=colors,
-                                    radii=[pixel_axis_radius, pixel_axis_radius, pixel_axis_radius]
-                                ))
+                                # Convert physical radius to pixel radius based on depth (Z) and focal length (f_x)
+                                Z = pts_cam[0, 2]
+                                f_x = frame.camera_matrix[0, 0]
+                                
+                                physical_radius = params.get("sphere_radius_m", 0.05)
+                                pixel_radius = max(1.0, (physical_radius * f_x) / Z)
+                                
+                                # Log 2D Point
+                                rr.log(f"Cameras/{c_name}/predicted_robot_body_overlay/{link_name}", rr.Points2D(img_pts[0:1], colors=[color], radii=[pixel_radius]))
+                                
+                                if show_frame and np.all(valid_mask):
+                                    physical_axis_radius = params.get("frame_axis_radius_m", 0.005)
+                                    pixel_axis_radius = max(1.0, (physical_axis_radius * f_x) / Z)
+                                    
+                                    strips = [
+                                        [img_pts[0], img_pts[1]], # Origin to X
+                                        [img_pts[0], img_pts[2]], # Origin to Y
+                                        [img_pts[0], img_pts[3]]  # Origin to Z
+                                    ]
+                                    colors = [
+                                        [255, 0, 0],
+                                        [0, 255, 0],
+                                        [0, 0, 255]
+                                    ]
+                                    
+                                    # Log 2D Line Strips
+                                    rr.log(f"Cameras/{c_name}/predicted_robot_body_overlay/{link_name}_frame", rr.LineStrips2D(
+                                        strips,
+                                        colors=colors,
+                                        radii=[pixel_axis_radius, pixel_axis_radius, pixel_axis_radius]
+                                    ))
             
     except KeyboardInterrupt:
         pass
