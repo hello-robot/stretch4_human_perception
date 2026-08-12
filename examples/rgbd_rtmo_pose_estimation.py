@@ -47,6 +47,13 @@ def rotate_to_upright(image_bgr, c_name):
     Rotates the camera image to an upright orientation based on its name.
     The Stretch cameras (left and right) are mounted rotated.
     """
+    try:
+        import stretch4_emulated_rgbd.emulated_rgbd_config as config_rgbd
+        if config_rgbd.ROTATE_IMAGES_TO_VERTICAL:
+            return image_bgr
+    except ImportError:
+        pass
+
     if c_name == "left":
         return cv2.rotate(image_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
     elif c_name == "right":
@@ -57,6 +64,13 @@ def remap_coordinate(u, v, c_name, orig_w, orig_h):
     """
     Remaps a 2D pixel coordinate from the upright orientation back to the native camera orientation.
     """
+    try:
+        import stretch4_emulated_rgbd.emulated_rgbd_config as config_rgbd
+        if config_rgbd.ROTATE_IMAGES_TO_VERTICAL:
+            return u, v
+    except ImportError:
+        pass
+
     if c_name == "left":
         return orig_w - 1.0 - v, u
     elif c_name == "right":

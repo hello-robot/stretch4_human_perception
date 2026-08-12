@@ -14,7 +14,7 @@ import rerun.blueprint as rrb
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from stretch4_emulated_rgbd.shared_utils import RGBDFrame
+    from stretch4_emulated_rgbd.shared_utils import RGBDFrame, MultiRGBDFrame
     from stretch4_emulated_rgbd.api import visualize_rgbd_frame, ValidityMaskManager, unproject_points
     from stretch4_emulated_rgbd import rgbd_networking as gn
 except ImportError:
@@ -35,6 +35,13 @@ COLORS = [
 ]
 
 def remap_coordinate(u, v, c_name, orig_w, orig_h):
+    try:
+        import stretch4_emulated_rgbd.emulated_rgbd_config as config_rgbd
+        if config_rgbd.ROTATE_IMAGES_TO_VERTICAL:
+            return u, v
+    except ImportError:
+        pass
+
     if c_name == "left":
         return orig_w - 1.0 - v, u
     elif c_name == "right":
@@ -129,7 +136,7 @@ def main():
     try:
         while True:
             output_dict = socket.recv_pyobj()
-            frame = RGBDFrame.from_dict(output_dict)
+            multi_frame = MultiRGBDFrame.from_dict(output_dict)
             
             if mask_manager is None:
                 robot_id = output_dict.get('robot_id')
@@ -143,13 +150,6 @@ def main():
             closest_joint_state = output_dict.get('closest_joint_state', None)
             
             frames_received += 1
-            img_seq = frame.image_frame.frame_number
-            if img_seq is not None:
-                if last_seq_num is not None:
-                    dropped = img_seq - last_seq_num - 1
-                    if dropped > 0:
-                        dropped_messages += dropped
-                last_seq_num = img_seq
                 
             # Log Joint States
             if closest_joint_state is not None:
@@ -163,133 +163,152 @@ def main():
                 rr.log("Telemetry/Wrist/Pitch", rr.Scalars(closest_joint_state['wrist_pitch']['angle']))
                 rr.log("Telemetry/Wrist/Roll", rr.Scalars(closest_joint_state['wrist_roll']['angle']))
 
-            c_name = frame.camera_type
-            lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
-            
-            # --- SAM 3.1 Segmentation ---
-            image_bgr = frame.image.copy()
-            orig_h, orig_w = image_bgr.shape[:2]
-            
-            # Unrotate if left/right to pass upright image to SAM
-            if c_name == "left":
-                image_bgr = cv2.rotate(image_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            elif c_name == "right":
-                image_bgr = cv2.rotate(image_bgr, cv2.ROTATE_90_CLOCKWISE)
-                
-            if args.tracking:
-                if c_name not in inference_states:
-                    inference_states[c_name] = pipeline.init_state()
-                    frames_received_per_cam[c_name] = 0
+            frames = []
+            if multi_frame.left: frames.append(multi_frame.left)
+            if multi_frame.right: frames.append(multi_frame.right)
+            if multi_frame.center: frames.append(multi_frame.center)
+
+            for frame in frames:
+                img_seq = frame.image_frame.frame_number
+                if img_seq is not None:
+                    if last_seq_num is not None:
+                        dropped = img_seq - last_seq_num - 1
+                        if dropped > 0:
+                            dropped_messages += dropped
+                    last_seq_num = img_seq
                     
-                frame_idx = frames_received_per_cam[c_name]
-                inf_state = inference_states[c_name]
+                c_name = frame.camera_type
+                lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
                 
-                pipeline.add_frame_to_state(inf_state, frame_idx, image_bgr)
-                if frame_idx == 0:
-                    pipeline.add_text_prompt(inf_state, frame_idx, obj_id=1, text=args.prompt)
-                results = pipeline.track_step(inf_state, frame_idx)
+                # --- SAM 3.1 Segmentation ---
+                image_bgr = frame.image.copy()
+                orig_h, orig_w = image_bgr.shape[:2]
                 
-                frames_received_per_cam[c_name] += 1
-            else:
-                results = pipeline.predict(image_bgr)
-            
-            # Clears old rerun annotations
-            prev_num = PREV_NUM_PEOPLE_CACHE.get(c_name, 0)
-            curr_num = len(results)
-            for i in range(curr_num, prev_num):
-                rr.log(f"SegmentedPeople/{c_name}/person_{i}_pts", rr.Clear(recursive=True))
-                rr.log(f"SegmentedPeople/{c_name}/person_{i}_center", rr.Clear(recursive=True))
-                rr.log(f"Pointclouds/base_frame/{c_name}/person_{i}_center", rr.Clear(recursive=True))
-                rr.log(f"Cameras/{c_name}/skeletal_overlay/person_{i}", rr.Clear(recursive=True))
-            PREV_NUM_PEOPLE_CACHE[c_name] = curr_num
+                # Unrotate if left/right to pass upright image to SAM
+                try:
+                    import stretch4_emulated_rgbd.emulated_rgbd_config as config_rgbd
+                    should_rotate = not config_rgbd.ROTATE_IMAGES_TO_VERTICAL
+                except ImportError:
+                    should_rotate = True
 
-            # Log RGBD frames to rerun
-            vig_mask, depth_mask = mask_manager.get_masks(c_name, lidar_str, frame.image.shape)
-            visualize_rgbd_frame(c_name, frame, vig_mask=vig_mask, depth_mask=depth_mask)
-
-            # 3D Variables
-            camera_matrix = frame.camera_matrix
-            dist_coeffs = frame.distortion_coefficients
-            
-            T_cam_to_base = None
-            if frame.T_base_to_cam is not None:
-                T_cam_to_base = np.linalg.inv(frame.T_base_to_cam)
-            else:
-                T_cam_to_base = np.eye(4)
-
-            for i, res in enumerate(results):
-                color = COLORS[i % len(COLORS)]
-                
-                rr.log(f"SegmentedPeople/{c_name}/person_{i}_center", rr.Clear(recursive=True))
-                rr.log(f"Pointclouds/base_frame/{c_name}/person_{i}_center", rr.Clear(recursive=True))
-                
-                # 1. Remap and visualize 2D boxes
-                box = res.get("box", None)
-                if box is not None:
-                    # Bounding boxes might be tricky to remap simply via corners if rotated by 90 degrees.
-                    # A rotated bounding box might require remapping min/max.
-                    xmin, ymin, xmax, ymax = box[:4]
-                    pt1 = remap_coordinate(xmin, ymin, c_name, orig_w, orig_h)
-                    pt2 = remap_coordinate(xmax, ymax, c_name, orig_w, orig_h)
-                    new_xmin = min(pt1[0], pt2[0])
-                    new_xmax = max(pt1[0], pt2[0])
-                    new_ymin = min(pt1[1], pt2[1])
-                    new_ymax = max(pt1[1], pt2[1])
+                if should_rotate:
+                    if c_name == "left":
+                        image_bgr = cv2.rotate(image_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                    elif c_name == "right":
+                        image_bgr = cv2.rotate(image_bgr, cv2.ROTATE_90_CLOCKWISE)
                     
-                    center = [(new_xmin + new_xmax) / 2, (new_ymin + new_ymax) / 2]
-                    half_sizes = [(new_xmax - new_xmin) / 2, (new_ymax - new_ymin) / 2]
-                    rr.log(f"Cameras/{c_name}/skeletal_overlay/person_{i}/bbox", rr.Boxes2D(centers=[center], half_sizes=[half_sizes], colors=[color]))
+                if args.tracking:
+                    if c_name not in inference_states:
+                        inference_states[c_name] = pipeline.init_state()
+                        frames_received_per_cam[c_name] = 0
                         
-                mask = np.array(res.get("mask", []))
-                if len(mask) > 0:
-                    pts = np.array(mask, np.float32).reshape((-1, 2))
-                    pts_orig = np.empty_like(pts)
-                    for j, (u, v) in enumerate(pts):
-                        orig_u, orig_v = remap_coordinate(u, v, c_name, orig_w, orig_h)
-                        pts_orig[j] = [orig_u, orig_v]
-                        
-                    rr.log(f"Cameras/{c_name}/skeletal_overlay/person_{i}/mask", rr.LineStrips2D([pts_orig], colors=[color]))
+                    frame_idx = frames_received_per_cam[c_name]
+                    inf_state = inference_states[c_name]
                     
-                    # 2. Extract 3D Segmented Points
-                    if frame.depth_image is not None and len(frame.depth_image) > 0:
-                        pts_reshaped = pts_orig.astype(np.int32).reshape(-1, 1, 2)
+                    pipeline.add_frame_to_state(inf_state, frame_idx, image_bgr)
+                    if frame_idx == 0:
+                        pipeline.add_text_prompt(inf_state, frame_idx, obj_id=1, text=args.prompt)
+                    results = pipeline.track_step(inf_state, frame_idx)
+                    
+                    frames_received_per_cam[c_name] += 1
+                else:
+                    results = pipeline.predict(image_bgr)
+                
+                # Clears old rerun annotations
+                prev_num = PREV_NUM_PEOPLE_CACHE.get(c_name, 0)
+                curr_num = len(results)
+                for i in range(curr_num, prev_num):
+                    rr.log(f"SegmentedPeople/{c_name}/person_{i}_pts", rr.Clear(recursive=True))
+                    rr.log(f"SegmentedPeople/{c_name}/person_{i}_center", rr.Clear(recursive=True))
+                    rr.log(f"Pointclouds/base_frame/{c_name}/person_{i}_center", rr.Clear(recursive=True))
+                    rr.log(f"Cameras/{c_name}/skeletal_overlay/person_{i}", rr.Clear(recursive=True))
+                PREV_NUM_PEOPLE_CACHE[c_name] = curr_num
+    
+                # Log RGBD frames to rerun
+                vig_mask, depth_mask = mask_manager.get_masks(c_name, lidar_str, frame.image.shape)
+                visualize_rgbd_frame(c_name, frame, vig_mask=vig_mask, depth_mask=depth_mask)
+    
+                # 3D Variables
+                camera_matrix = frame.camera_matrix
+                dist_coeffs = frame.distortion_coefficients
+                
+                T_cam_to_base = None
+                if frame.T_base_to_cam is not None:
+                    T_cam_to_base = np.linalg.inv(frame.T_base_to_cam)
+                else:
+                    T_cam_to_base = np.eye(4)
+    
+                for i, res in enumerate(results):
+                    color = COLORS[i % len(COLORS)]
+                    
+                    rr.log(f"SegmentedPeople/{c_name}/person_{i}_center", rr.Clear(recursive=True))
+                    rr.log(f"Pointclouds/base_frame/{c_name}/person_{i}_center", rr.Clear(recursive=True))
+                    
+                    # 1. Remap and visualize 2D boxes
+                    box = res.get("box", None)
+                    if box is not None:
+                        xmin, ymin, xmax, ymax = box[:4]
+                        pt1 = remap_coordinate(xmin, ymin, c_name, orig_w, orig_h)
+                        pt2 = remap_coordinate(xmax, ymax, c_name, orig_w, orig_h)
+                        new_xmin = min(pt1[0], pt2[0])
+                        new_xmax = max(pt1[0], pt2[0])
+                        new_ymin = min(pt1[1], pt2[1])
+                        new_ymax = max(pt1[1], pt2[1])
                         
-                        # Create full resolution binary mask of the segmented person in unrotated coordinates
-                        binary_mask = np.zeros((orig_h, orig_w), dtype=np.uint8)
-                        cv2.fillPoly(binary_mask, [pts_reshaped], 1)
-
-                        depth_image = frame.depth_image
-                        valid_depth_mask = (depth_image > 0) & (depth_image != np.inf) & (~np.isnan(depth_image)) & (binary_mask == 1)
-                        if depth_mask is not None:
-                            valid_depth_mask &= (depth_mask > 0)
+                        center = [(new_xmin + new_xmax) / 2, (new_ymin + new_ymax) / 2]
+                        half_sizes = [(new_xmax - new_xmin) / 2, (new_ymax - new_ymin) / 2]
+                        rr.log(f"Cameras/{c_name}/skeletal_overlay/person_{i}/bbox", rr.Boxes2D(centers=[center], half_sizes=[half_sizes], colors=[color]))
                             
-                        v_vals, u_vals = np.where(valid_depth_mask)
-                        z_vals = depth_image[valid_depth_mask]
+                    mask = np.array(res.get("mask", []))
+                    if len(mask) > 0:
+                        pts = np.array(mask, np.float32).reshape((-1, 2))
+                        pts_orig = np.empty_like(pts)
+                        for j, (u, v) in enumerate(pts):
+                            orig_u, orig_v = remap_coordinate(u, v, c_name, orig_w, orig_h)
+                            pts_orig[j] = [orig_u, orig_v]
+                            
+                        rr.log(f"Cameras/{c_name}/skeletal_overlay/person_{i}/mask", rr.LineStrips2D([pts_orig], colors=[color]))
                         
-                        pts_3d_cam = project_points_to_3d(u_vals, v_vals, z_vals, camera_matrix, dist_coeffs)
-                        if len(pts_3d_cam) > 0:
-                            pts_3d_base = np.dot(T_cam_to_base[:3, :3], pts_3d_cam.T).T + T_cam_to_base[:3, 3]
+                        # 2. Extract 3D Segmented Points
+                        if frame.depth_image is not None and len(frame.depth_image) > 0:
+                            pts_reshaped = pts_orig.astype(np.int32).reshape(-1, 1, 2)
                             
-                            # Compute median before subsampling
-                            median_pt = np.median(pts_3d_base, axis=0)
-                            
-                            # Subsample if too many points to avoid slowing down rerun
-                            if len(pts_3d_base) > 5000:
-                                indices = np.random.choice(len(pts_3d_base), 5000, replace=False)
-                                pts_3d_base = pts_3d_base[indices]
+                            # Create full resolution binary mask of the segmented person in unrotated coordinates
+                            binary_mask = np.zeros((orig_h, orig_w), dtype=np.uint8)
+                            cv2.fillPoly(binary_mask, [pts_reshaped], 1)
+    
+                            depth_image = frame.depth_image
+                            valid_depth_mask = (depth_image > 0) & (depth_image != np.inf) & (~np.isnan(depth_image)) & (binary_mask == 1)
+                            if depth_mask is not None:
+                                valid_depth_mask &= (depth_mask > 0)
                                 
-                            rr.log(f"SegmentedPeople/{c_name}/person_{i}_pts", 
-                                   rr.Points3D(pts_3d_base, colors=[color], radii=[0.005]))
-                                   
-                            sphere_radius = 0.05
-                            rr.log(f"SegmentedPeople/{c_name}/person_{i}_center", 
-                                   rr.Points3D([median_pt], colors=[color], radii=[sphere_radius]))
-                            rr.log(f"Pointclouds/base_frame/{c_name}/person_{i}_center", 
-                                   rr.Points3D([median_pt], colors=[color], radii=[sphere_radius]))
-                        else:
-                            rr.log(f"SegmentedPeople/{c_name}/person_{i}_pts", rr.Clear(recursive=True))
-                            rr.log(f"SegmentedPeople/{c_name}/person_{i}_center", rr.Clear(recursive=True))
-                            rr.log(f"Pointclouds/base_frame/{c_name}/person_{i}_center", rr.Clear(recursive=True))
+                            v_vals, u_vals = np.where(valid_depth_mask)
+                            z_vals = depth_image[valid_depth_mask]
+                            
+                            pts_3d_cam = project_points_to_3d(u_vals, v_vals, z_vals, camera_matrix, dist_coeffs)
+                            if len(pts_3d_cam) > 0:
+                                pts_3d_base = np.dot(T_cam_to_base[:3, :3], pts_3d_cam.T).T + T_cam_to_base[:3, 3]
+                                
+                                # Compute median before subsampling
+                                median_pt = np.median(pts_3d_base, axis=0)
+                                
+                                # Subsample if too many points to avoid slowing down rerun
+                                if len(pts_3d_base) > 5000:
+                                    indices = np.random.choice(len(pts_3d_base), 5000, replace=False)
+                                    pts_3d_base = pts_3d_base[indices]
+                                    
+                                rr.log(f"SegmentedPeople/{c_name}/person_{i}_pts", 
+                                       rr.Points3D(pts_3d_base, colors=[color], radii=[0.005]))
+                                       
+                                sphere_radius = 0.05
+                                rr.log(f"SegmentedPeople/{c_name}/person_{i}_center", 
+                                       rr.Points3D([median_pt], colors=[color], radii=[sphere_radius]))
+                                rr.log(f"Pointclouds/base_frame/{c_name}/person_{i}_center", 
+                                       rr.Points3D([median_pt], colors=[color], radii=[sphere_radius]))
+                            else:
+                                rr.log(f"SegmentedPeople/{c_name}/person_{i}_pts", rr.Clear(recursive=True))
+                                rr.log(f"SegmentedPeople/{c_name}/person_{i}_center", rr.Clear(recursive=True))
+                                rr.log(f"Pointclouds/base_frame/{c_name}/person_{i}_center", rr.Clear(recursive=True))
             
             # Print stats
             current_time = time.time()

@@ -15,7 +15,7 @@ import rerun.blueprint as rrb
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from stretch4_emulated_rgbd.shared_utils import RGBDFrame
+    from stretch4_emulated_rgbd.shared_utils import RGBDFrame, MultiRGBDFrame
     from stretch4_emulated_rgbd.api import visualize_rgbd_frame, ValidityMaskManager, unproject_points
     from stretch4_emulated_rgbd import rgbd_networking as gn
 except ImportError:
@@ -69,7 +69,7 @@ class FollowPersonFSM:
         }
         self.cmd_socket.send_pyobj(cmd)
 
-    def update(self, people_3d_info, orig_w):
+    def update(self, people_3d_info, orig_w=None):
         if self.state == State.INITIALIZE:
             if len(people_3d_info) > 0:
                 self.state = State.FIND_PERSON
@@ -107,10 +107,15 @@ class FollowPersonFSM:
                     print(f"WARNING: Target jumped by {jump_dist:.2f}m!")
             self.last_target_pos = current_pos
             
+            # Use orig_w from target_info if present, else fall back to the argument
+            w = target_info.get('orig_w', orig_w)
+            if w is None:
+                w = 1280
+                
             # Rotation
             # Rotate the robot to keep the person in the center of the image.
             # horizontal_error is the normalized position of the person in the image. 0 means center, -1 means left, 1 means right.
-            horizontal_error = (u_proj - (orig_w / 2.0)) / (orig_w / 2.0)
+            horizontal_error = (u_proj - (w / 2.0)) / (w / 2.0)
             vtheta = -config.KP_ROT * horizontal_error
             
             # State transition and Translation
@@ -248,7 +253,7 @@ def main():
     try:
         while True:
             output_dict = sub_socket.recv_pyobj()
-            frame = RGBDFrame.from_dict(output_dict)
+            multi_frame = MultiRGBDFrame.from_dict(output_dict)
             
             if mask_manager is None:
                 robot_id = output_dict.get('robot_id')
@@ -262,14 +267,7 @@ def main():
             closest_joint_state = output_dict.get('closest_joint_state', None)
             
             frames_received += 1
-            img_seq = frame.image_frame.frame_number
-            if img_seq is not None:
-                if last_seq_num is not None:
-                    dropped = img_seq - last_seq_num - 1
-                    if dropped > 0:
-                        dropped_messages += dropped
-                last_seq_num = img_seq
-                
+            
             # Log Joint States
             if closest_joint_state is not None:
                 rr.set_time("timestamp", timestamp=closest_joint_state['monotonic_timestamp'])
@@ -282,20 +280,43 @@ def main():
                 rr.log("Telemetry/Wrist/Pitch", rr.Scalars(closest_joint_state['wrist_pitch']['angle']))
                 rr.log("Telemetry/Wrist/Roll", rr.Scalars(closest_joint_state['wrist_roll']['angle']))
 
-            c_name = frame.camera_type
-            lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
+            frames = []
+            if multi_frame.left: frames.append(multi_frame.left)
+            if multi_frame.right: frames.append(multi_frame.right)
+            if multi_frame.center: frames.append(multi_frame.center)
             
-            # Log RGBD frames to rerun
-            vig_mask, depth_mask = mask_manager.get_masks(c_name, lidar_str, frame.image.shape)
-            visualize_rgbd_frame(c_name, frame, vig_mask=vig_mask, depth_mask=depth_mask)
-
-            people_3d_info, orig_w, orig_h = tracker.process_frame(frame, depth_mask=depth_mask)
+            all_people_3d_info = {}
+            
+            for frame in frames:
+                img_seq = frame.image_frame.frame_number
+                if img_seq is not None:
+                    if last_seq_num is not None:
+                        dropped = img_seq - last_seq_num - 1
+                        if dropped > 0:
+                            dropped_messages += dropped
+                    last_seq_num = img_seq
+                    
+                c_name = frame.camera_type
+                lidar_str = frame.lidars_used if frame.lidars_used else "no_lidar"
+                
+                # Log RGBD frames to rerun
+                vig_mask, depth_mask = mask_manager.get_masks(c_name, lidar_str, frame.image.shape)
+                visualize_rgbd_frame(c_name, frame, vig_mask=vig_mask, depth_mask=depth_mask)
+    
+                people_3d_info, orig_w, orig_h = tracker.process_frame(frame, depth_mask=depth_mask)
+                for pid, info in people_3d_info.items():
+                    info['orig_w'] = orig_w
+                    all_people_3d_info[f"{c_name}_{pid}"] = info
             
             # --- FSM Update ---
-            target_id = fsm.update(people_3d_info, orig_w)
+            target_id_str = fsm.update(all_people_3d_info)
             
-            if target_id is not None:
-                rr.log(f"SegmentedPeople/{c_name}/person_{target_id}_center/status", rr.TextDocument(f"TARGET ({fsm.state.name})"))
+            if target_id_str is not None:
+                try:
+                    target_c_name, target_pid = target_id_str.split('_', 1)
+                    rr.log(f"SegmentedPeople/{target_c_name}/person_{target_pid}_center/status", rr.TextDocument(f"TARGET ({fsm.state.name})"))
+                except ValueError:
+                    pass
             
             # Print stats
             current_time = time.time()
