@@ -73,6 +73,7 @@ python3 setup_models.py --size all
 Please clone the SAM 3.1 repository and install it as described in its README: https://github.com/facebookresearch/sam3. You will need to request access for the SAM 3.1 model weights on [Hugging Face](https://huggingface.co/facebook/sam3) and authenticate using the Hugging Face CLI:
 
 ```bash
+pip install -U huggingface_hub
 hf auth login
 ```
 
